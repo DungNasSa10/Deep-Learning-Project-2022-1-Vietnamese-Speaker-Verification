@@ -4,7 +4,7 @@
 + Data Preprocessing: 
   + resources:
     + [lab914hust](https://github.com/lab914hust)
-    + [`common voice`](https://commonvoice.mozilla.org/en/datasets  
+    + [`common voice`](https://commonvoice.mozilla.org/en/datasets)
     + Youtube crawl
   
   + use pretrained for labeling
