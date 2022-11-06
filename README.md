@@ -25,3 +25,4 @@
     + [ECAPA-TDNN](references/ECAPA-TDNN%20Emphasized%20Channel%20Attention,%20Propagation%20and%20Aggregation%20in%20TDNN%20Based%20Speaker%20Verification.pdf)
     + [Code](https://github.com/DungNasSa10/Asian-Multi-lingual-Speaker-Verification?fbclid=IwAR3BjVMtS_futPNMaYyQ7CmD1nkl5dpCIdR6OAbUZjTFMU7KAWbFa_FUiY0)
   
+## Note about crawling data: Each member need to find 100+ people with as many videos per people as you want but no more than 25 minutes in total (2-5 videos per people is recommended)
