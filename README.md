@@ -27,3 +27,17 @@
   
 ## Note about crawling data: 
 Each member need to find 100+ people with as many videos per people as you want but no more than 25 minutes in total (2-5 videos per people is recommended)
+
+## Pretrained models
+### Voice Activity Detection (VAD)
++ Name:
++ Where to load pretrained:
++ Model inputs:
++ Model outputs:
+
+
+### Model for similarity-verifying
++ Name:
++ Where to load pretrained:
++ Model inputs:
++ Model outputs:
