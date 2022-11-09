@@ -30,14 +30,14 @@ Each member need to find 100+ people with as many videos per people as you want 
 
 ## Pretrained models
 ### Voice Activity Detection (VAD)
-+ Name:
-+ Where to load pretrained:
++ Name: [Silero-VAD](https://pytorch.org/hub/snakers4_silero-vad_vad/)
 + Model inputs:
 + Model outputs:
 
 
 ### Model for similarity-verifying
-+ Name:
-+ Where to load pretrained:
-+ Model inputs:
-+ Model outputs:
++ Model: [ECAPA-TDNN](https://github.com/TaoRuijie/ECAPA-TDNN/blob/main/exps/pretrain.model)
+
+          [RawNet3](https://huggingface.co/jungjee/RawNet3/blob/main/model.pt)
++ Model inputs: audio
++ Model outputs: embedding vector
