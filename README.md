@@ -36,8 +36,6 @@ Each member need to find 100+ people with as many videos per people as you want 
 
 
 ### Model for similarity-verifying
-+ Model: [ECAPA-TDNN](https://github.com/TaoRuijie/ECAPA-TDNN/blob/main/exps/pretrain.model)
-
-          [RawNet3](https://huggingface.co/jungjee/RawNet3/blob/main/model.pt)
++ Model: [ECAPA-TDNN](https://github.com/TaoRuijie/ECAPA-TDNN/blob/main/exps/pretrain.model), [RawNet3](https://huggingface.co/jungjee/RawNet3/blob/main/model.pt)
 + Model inputs: audio
 + Model outputs: embedding vector
