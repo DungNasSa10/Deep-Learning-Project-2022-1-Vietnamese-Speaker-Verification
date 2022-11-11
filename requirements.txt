@@ -1,0 +1,4 @@
+soundfile
+librosa
+pytube
+pandas

@@ -1,0 +1,37 @@
+
++ Download videos, convert to wav
+    + input: 
+        + url
+        + ...
+    + output:
+        + wav data, store in memory
+
++ VAD process, 
+    + input:
+        + wav data, store in memory
+	+ output:
+		+ list of splitted chunks that have speaker's voice, store in directory
+		
++ Pretest voice similarity among videos that have the different speaker + remove outliers		
+	+ input:
+		+ output of VAD process
+	+ output:
+        + list of splitted wav chunkss, store in directory
+		+ delete all audio from VAD process
+
++ Use rules to create train and validation dataset
+    + input:
+        + ...
+    + output:
+        + train and validation dataset, store in directory
+
++ Build model:
+    + ModelIO (supports load and save model)
+    + Main model
+
++ Loss functions, activattion functions
+    + ...
+
++ Trainer (code for training model)
+
++ Deploy
