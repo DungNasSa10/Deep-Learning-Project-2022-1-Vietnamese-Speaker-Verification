@@ -57,7 +57,6 @@ class Downloader:
             mp3_path = base + '.mp3'
             os.rename(out_path, mp3_path)
 
-            self.logger.info('Downloaded audio')
             self.logger.info('Downloaded audio successfully, store at ' + mp3_path)
 
         return mp3_path, True
@@ -104,7 +103,6 @@ class Downloader:
 
     def run(self, urls: List[str], save_dir: str, download_first: bool, remove_mp3:bool, wav_sample_rate=16000):
         if os.path.exists(save_dir) is False:
-            self.logger
             os.makedirs(save_dir)
 
         def exec(mp3_path):
