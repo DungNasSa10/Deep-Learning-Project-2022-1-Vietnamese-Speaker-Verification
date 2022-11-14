@@ -3,3 +3,4 @@ librosa
 pytube
 pandas
 speechbrain
+glob2
