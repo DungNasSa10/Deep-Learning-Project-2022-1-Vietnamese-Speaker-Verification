@@ -3,12 +3,12 @@ import subprocess
 import librosa
 import soundfile
 from pytube import YouTube
-from typing import Tuple, List
+from typing import Tuple
 from ..utils.logger import get_logger
-from ..utils.prepare_data import get_voices_and_urls
+from .mixin import StepMixin
 
 
-class Downloader:
+class Downloader(StepMixin):
     """
     Downloader save directory tree:
         data
@@ -22,7 +22,7 @@ class Downloader:
     """
 
     def __init__(self) -> None:
-        self.logger = get_logger("Downloader")
+        super().__init__()        
 
     def download_mp3(self, url: str, save_dir: str) -> Tuple[str, bool]:
         """
@@ -50,7 +50,7 @@ class Downloader:
 
         else:
             ### download the file
-            self.logger.info("Start downloading audio at " + url + " ...")
+            self.logger.info("Start downloading audio at " + url)
             out_path = audio.download(output_path=save_dir)
             
             ### save the file
@@ -61,17 +61,6 @@ class Downloader:
             self.logger.info('Downloaded audio successfully, store at ' + mp3_path)
 
         return mp3_path, True
-
-    def download_multiple_mp3(self, urls: List[str], save_dir: str) -> List[str]:
-        """
-        Args:
-            urls: list of Youtube video url
-            save_dir: save directory
-
-        Returns:
-            list of mp3 file paths
-        """
-        return [self.download_mp3(url, save_dir) for url in urls]
 
     @staticmethod
     def mp3_to_wav(mp3_path: str, wav_path: str=None) -> str:
@@ -93,71 +82,33 @@ class Downloader:
         """
         Args:
             wav_path: path to your wave file
-            save_path: path to save you resampled wav
+            save_path: path to save you resampled wav \
+                If None then overwrite file to wav_path
             target_sr: target sample rate
+
+        Returns:
+            path to resampled wav file
         """
         save_path   = wav_path if save_path is None else save_path
         y, sr       = librosa.load(wav_path)       
         y_k         = librosa.resample(y, orig_sr=sr, target_sr=target_sr)
         y_mono      = librosa.to_mono(y_k)
         soundfile.write(save_path, y_mono, target_sr)
+        return save_path
 
-    def download(self, urls: List[str], save_dir: str, download_first: bool, remove_mp3: bool, wav_sample_rate: int=16000):
+    def run(self, url: str, save_dir: str, sampling_rate: int=16000, remove_mp3: bool=True):
         """
-        Args:
-            urls: list[str] \
-                list of url
-            save_dir: str \
-                directory to save .wav file
-            download_first: 
-                if True then all videos will be converted to .wav file after duwnloading process finishes
-            remove_mp3: 
-                remove old mp3 files or not
-            wav_sample_rate: int, default = 16000 \
-                sample rate of .wav file
+        Returns:
+            path to downloaded .wav file
         """
-        if os.path.exists(save_dir) is False:
-            os.makedirs(save_dir)
-            self.logger.warning("Create directory " + save_dir)
+        mp3_path, status = self.download_mp3(url, save_dir=save_dir)
+        if os.path.splitext(mp3_path)[-1] == '.mp3':
+            self.logger.info("Convert into .wav and resample audio")
+            save_path = self.resample_wav(self.mp3_to_wav(mp3_path), target_sr=sampling_rate)
 
-        def exec(mp3_path):
-            if os.path.splitext(mp3_path)[-1] == '.mp3':
-                self.logger.info("Convert and resample audio")
-                self.resample_wav(self.mp3_to_wav(mp3_path), target_sr=wav_sample_rate)
+            if remove_mp3:
                 os.remove(mp3_path)
-                if remove_mp3:
-                    self.logger.info("Remove " + mp3_path)
-
-        if download_first:
-            downloaded_mp3_paths = self.download_multiple_mp3(urls, save_dir)
-            for mp3_path, status in downloaded_mp3_paths:
-                exec(mp3_path)
-
-        else:
-            for url in urls:
-                mp3_path, status = self.download_mp3(url, save_dir)
-                exec(mp3_path)
-
-    def run(self, csv_voice_filepath: str, save_dir: str, download_first: bool, remove_mp3: bool, wav_sample_rate: int=16000):
-        """
-        Args:
-            csv_voice_filepath: str
-            save_dir: str \
-                directory to save .wav file
-            download_first: 
-                if True then all videos will be converted to .wav file after duwnloading process finishes
-            remove_mp3: 
-                remove old mp3 files or not
-            wav_sample_rate: int, default = 16000 \
-                sample rate of .wav file
-        """
-        voice_and_urls = get_voices_and_urls(csv_voice_filepath)
-
-        for v, urls in voice_and_urls:
-            self.logger.info("Start downloading videos of voice: " + v + " ...")
-            path = os.path.join(save_dir, v)
-            if os.path.exists(path) is False:
-                os.makedirs(path)
-                self.logger.warning("Create directory " + path)
-            
-            self.download(urls, save_dir=path, download_first=download_first, remove_mp3=remove_mp3, wav_sample_rate=wav_sample_rate)
+                self.logger.info("Remove " + mp3_path)
+        
+            return save_path
+        return None

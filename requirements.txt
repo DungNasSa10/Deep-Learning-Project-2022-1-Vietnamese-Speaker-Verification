@@ -2,3 +2,4 @@ soundfile
 librosa
 pytube
 pandas
+speechbrain

@@ -8,6 +8,7 @@ __formatter = logging.Formatter(__FORMAT__)
 logging.basicConfig(format=__FORMAT__)
 
 __logger_dict__ = {}
+__log_file__ = None
 
 
 def get_logger(name: str):
@@ -20,7 +21,13 @@ def get_logger(name: str):
     logger = logging.getLogger(name)
     logger.setLevel(LOG_LEVEL)
 
-    fh = logging.FileHandler(os.path.join(LOG_DIR, f"{name}-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"), mode='w')
+    global __log_file__
+    if __log_file__ is None:
+        __log_file__ = f"CRAWLER-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+        fh = logging.FileHandler(os.path.join(LOG_DIR, __log_file__), mode='w', encoding='utf-8')
+    else:
+        fh = logging.FileHandler(os.path.join(LOG_DIR, __log_file__), mode='a', encoding='utf-8')
+
     fh.setFormatter(__formatter)
     fh.setLevel(LOG_LEVEL)
     logger.addHandler(fh)
