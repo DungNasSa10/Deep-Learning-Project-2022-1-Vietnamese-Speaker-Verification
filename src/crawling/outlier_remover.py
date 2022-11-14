@@ -1,0 +1,2 @@
+class OutlierRemover:
+    pass
