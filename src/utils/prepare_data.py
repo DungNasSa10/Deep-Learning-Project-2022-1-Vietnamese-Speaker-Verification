@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from glob2 import glob
 
 
 def get_voices_and_urls(filepath: str) -> list:
@@ -19,5 +20,6 @@ def get_voices_and_urls(filepath: str) -> list:
 
 
 def get_wav_files(wav_dir: str) -> list:
+    return glob(os.path.join(wav_dir, '*.wav'))
     for root, _, files in os.walk(wav_dir):
         return [os.path.join(root, file) for file in files if os.path.splitext(file)[-1] == '.wav']
