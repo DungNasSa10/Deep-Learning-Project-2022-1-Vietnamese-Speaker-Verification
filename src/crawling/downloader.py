@@ -57,6 +57,7 @@ class Downloader(StepMixin):
             base, _ = os.path.splitext(out_path)
             mp3_path = base + '.mp3'
             os.rename(out_path, mp3_path)
+            self.logger.warning(f"Rename {out_path} to {mp3_path}")
 
             self.logger.info('Downloaded audio successfully, store at ' + mp3_path)
 
@@ -111,4 +112,4 @@ class Downloader(StepMixin):
                 self.logger.info("Remove " + mp3_path)
         
             return save_path
-        return None
+        return mp3_path

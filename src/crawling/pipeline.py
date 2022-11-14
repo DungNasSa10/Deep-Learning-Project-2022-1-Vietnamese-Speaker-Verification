@@ -3,6 +3,7 @@ from ..utils.prepare_data import get_voices_and_urls
 from .mixin import StepMixin
 from .downloader import Downloader
 from .vad_processor import VADProcessor
+from .outlier_remover import OutlierRemover
 
 
 class Pipeline(StepMixin):
@@ -11,6 +12,7 @@ class Pipeline(StepMixin):
 
         self.downloader = Downloader()
         self.vad_processor = VADProcessor()
+        self.outlier_remover = OutlierRemover()
 
     def run(self, csv_voice_filepath: str, save_dir: str='./data/wavs', remove_mp3: bool=True, wav_sample_rate: int=16000):
         """
@@ -34,5 +36,6 @@ class Pipeline(StepMixin):
             
             for url in urls:
                 wav_path = self.downloader.run(url, save_dir=path, sampling_rate=wav_sample_rate, remove_mp3=remove_mp3)
-                self.vad_processor.run(wav_path, sampling_rate=wav_sample_rate)
+                wav_dir = self.vad_processor.run(wav_path, sampling_rate=wav_sample_rate)
+                self.outlier_remover.run(wav_dir)
                 return
