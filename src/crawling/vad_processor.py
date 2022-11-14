@@ -116,7 +116,7 @@ class VADProcessor(StepMixin):
                 os.remove(file)
                 self.logger.warning("Remove " + file)
             else:
-                new_file = os.path.join(os.path.dirname(file), f'{k}.wav')
+                new_file = os.path.join(wav_dir, f'{k}.wav')
                 os.rename(file, new_file)
                 k += 1
                 self.logger.warning(f"Rename {file} to {new_file}")
