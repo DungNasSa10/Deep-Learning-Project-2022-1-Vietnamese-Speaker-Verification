@@ -106,7 +106,6 @@ class VADProcessor(StepMixin):
         self.logger.info("Remove some unnecessary .wav file")
         files = get_wav_files(wav_dir)
         self.logger.info(f"Detect {len(files)} .wav files in {wav_dir}")
-        k = 0
 
         for file in files:
             y, sr = soundfile.read(file)
@@ -115,11 +114,7 @@ class VADProcessor(StepMixin):
             if wav_length < 3 or wav_length > 10:
                 os.remove(file)
                 self.logger.warning("Remove " + file)
-            else:
-                new_file = os.path.join(wav_dir, f'{k}.wav')
-                os.rename(file, new_file)
-                k += 1
-                self.logger.warning(f"Rename {file} to {new_file}")
+
         return wav_dir
 
     def run(self, wav_path: str, sampling_rate: int=16000) -> str:

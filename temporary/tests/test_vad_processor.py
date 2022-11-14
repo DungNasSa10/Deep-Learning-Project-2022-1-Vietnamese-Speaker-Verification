@@ -6,5 +6,5 @@ from src.crawling.vad_processor import VADProcessor
 
 vad = VADProcessor()
 
-print(vad.vad("./data/wavs/ED/Ed Sheeran - Bad Habits [Official Video].wav", sampling_rate=16000))
+print(vad.vad("../../data/wav/Chu-Văn-Biên/Nội dung chương trình Vật lí 11_Thầy Chu Văn Biên.wav", sampling_rate=16000))
 
