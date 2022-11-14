@@ -102,7 +102,20 @@ class Downloader:
         y_mono      = librosa.to_mono(y_k)
         soundfile.write(save_path, y_mono, target_sr)
 
-    def download(self, urls: List[str], save_dir: str, download_first: bool, remove_mp3: bool, wav_sample_rate=16000):
+    def download(self, urls: List[str], save_dir: str, download_first: bool, remove_mp3: bool, wav_sample_rate: int=16000):
+        """
+        Args:
+            urls: list[str] \
+                list of url
+            save_dir: str \
+                directory to save .wav file
+            download_first: 
+                if True then all videos will be converted to .wav file after duwnloading process finishes
+            remove_mp3: 
+                remove old mp3 files or not
+            wav_sample_rate: int, default = 16000 \
+                sample rate of .wav file
+        """
         if os.path.exists(save_dir) is False:
             os.makedirs(save_dir)
             self.logger.warning("Create directory " + save_dir)
@@ -125,7 +138,19 @@ class Downloader:
                 mp3_path, status = self.download_mp3(url, save_dir)
                 exec(mp3_path)
 
-    def run(self, csv_voice_filepath: str, save_dir: str, download_first: bool, remove_mp3: bool, wav_sample_rate=16000):
+    def run(self, csv_voice_filepath: str, save_dir: str, download_first: bool, remove_mp3: bool, wav_sample_rate: int=16000):
+        """
+        Args:
+            csv_voice_filepath: str
+            save_dir: str \
+                directory to save .wav file
+            download_first: 
+                if True then all videos will be converted to .wav file after duwnloading process finishes
+            remove_mp3: 
+                remove old mp3 files or not
+            wav_sample_rate: int, default = 16000 \
+                sample rate of .wav file
+        """
         voice_and_urls = get_voices_and_urls(csv_voice_filepath)
 
         for v, urls in voice_and_urls:
