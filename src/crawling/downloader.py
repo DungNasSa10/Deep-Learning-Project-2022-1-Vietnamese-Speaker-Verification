@@ -108,8 +108,8 @@ class Downloader(StepMixin):
             save_path = self.resample_wav(self.mp3_to_wav(mp3_path), target_sr=sampling_rate)
 
             if remove_mp3:
-                os.remove(mp3_path)
                 self.logger.info("Remove " + mp3_path)
+                os.remove(mp3_path)
         
             return save_path
         return mp3_path

@@ -90,5 +90,5 @@ class OutlierRemover(StepMixin):
             for i, file in tqdm(enumerate(files), total=len(files)):
                 if mean_scores[i] < threshold:
                     # print(mean_scores[i], file)
-                    os.remove(file)
                     self.logger.warning("Remove " + file)
+                    os.remove(file)

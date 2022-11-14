@@ -113,11 +113,11 @@ class VADProcessor(StepMixin):
             wav_length = len(y) / sr
 
             if wav_length < 3 or wav_length > 10:
-                os.remove(file)
                 self.logger.warning("Remove " + file)
+                os.remove(file)
             else:
-                new_file = os.path.join(os.path.dirname(file), f'{k}.wav')
-                self.logger.warning(f"Rename {file} to {new_file}")
+                new_file = os.path.join(wav_dir, f'{k}.wav')
+                self.logger.warning(f"Rename {file}  to  {new_file}")
                 os.rename(file, new_file)
                 k += 1
         return wav_dir

@@ -24,7 +24,7 @@ def get_logger(name: str):
     global __log_file__
     if __log_file__ is None:
         __log_file__ = f"CRAWLER-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
-        f = open(__log_file__, 'w')
+        f = open(os.path.join(LOG_DIR, __log_file__), 'w')
         f.close()
 
     fh = logging.FileHandler(os.path.join(LOG_DIR, __log_file__), mode='a', encoding='utf-8')
