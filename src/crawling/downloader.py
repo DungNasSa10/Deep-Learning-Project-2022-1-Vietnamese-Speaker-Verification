@@ -3,8 +3,9 @@ import subprocess
 import librosa
 import soundfile
 from pytube import YouTube
-from typing import *
+from typing import Tuple, List
 from ..utils.logger import get_logger
+from ..utils.prepare_data import get_voices_and_urls
 
 
 class Downloader:
@@ -49,7 +50,7 @@ class Downloader:
 
         else:
             ### download the file
-            self.logger.info("Start downloading audio at " + url)
+            self.logger.info("Start downloading audio at " + url + " ...")
             out_path = audio.download(output_path=save_dir)
             
             ### save the file
@@ -101,9 +102,10 @@ class Downloader:
         y_mono      = librosa.to_mono(y_k)
         soundfile.write(save_path, y_mono, target_sr)
 
-    def run(self, urls: List[str], save_dir: str, download_first: bool, remove_mp3:bool, wav_sample_rate=16000):
+    def download(self, urls: List[str], save_dir: str, download_first: bool, remove_mp3: bool, wav_sample_rate=16000):
         if os.path.exists(save_dir) is False:
             os.makedirs(save_dir)
+            self.logger.warning("Create directory " + save_dir)
 
         def exec(mp3_path):
             if os.path.splitext(mp3_path)[-1] == '.mp3':
@@ -122,3 +124,15 @@ class Downloader:
             for url in urls:
                 mp3_path, status = self.download_mp3(url, save_dir)
                 exec(mp3_path)
+
+    def run(self, csv_voice_filepath: str, save_dir: str, download_first: bool, remove_mp3: bool, wav_sample_rate=16000):
+        voice_and_urls = get_voices_and_urls(csv_voice_filepath)
+
+        for v, urls in voice_and_urls:
+            self.logger.info("Start downloading videos of voice: " + v + " ...")
+            path = os.path.join(save_dir, v)
+            if os.path.exists(path) is False:
+                os.makedirs(path)
+                self.logger.warning("Create directory " + path)
+            
+            self.download(urls, save_dir=path, download_first=download_first, remove_mp3=remove_mp3, wav_sample_rate=wav_sample_rate)
