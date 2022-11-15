@@ -31,8 +31,7 @@ class Downloader(StepMixin):
             save_dir: save directory
         
         Returns:
-            file path of mp3 file and download status, True is downloaded, else False \
-            if return None => there is no mp3 downloaded
+            file path of mp3 file
         """
         yt = YouTube(url)
         
@@ -41,27 +40,28 @@ class Downloader(StepMixin):
         audio_name = audio.default_filename.split('.')[0]
 
         if os.path.exists(os.path.join(save_dir, audio_name + '.wav')):
-            self.logger.warning("Skip downloading audio at " + url + " because the audio has been downloaded")
-            return os.path.join(save_dir, audio_name + '.wav'), False
+            fp = os.path.join(save_dir, audio_name + '.wav')
+            self.logger.warning("Remove old file: " + fp)
+            os.remove(fp)
 
         if os.path.exists(os.path.join(save_dir, audio_name + '.mp3')):
-            self.logger.warning("Skip downloading audio at " + url + " because the audio has been downloaded")
-            return os.path.join(save_dir, audio_name + '.mp3'), False
+            fp = os.path.join(save_dir, audio_name + '.mp3')
+            self.logger.warning("Remove old file: " + fp)
+            os.remove(fp)
 
-        else:
-            ### download the file
-            self.logger.info("Start downloading audio at " + url)
-            out_path = audio.download(output_path=save_dir)
-            
-            ### save the file
-            base, _ = os.path.splitext(out_path)
-            mp3_path = base + '.mp3'
-            self.logger.warning(f"Rename {out_path} to {mp3_path}")
-            os.rename(out_path, mp3_path)
+        ### download the file
+        self.logger.info("Start downloading audio at " + url)
+        out_path = audio.download(output_path=save_dir)
+        
+        ### save the file
+        base, _ = os.path.splitext(out_path)
+        mp3_path = base + '.mp3'
+        self.logger.warning(f"Rename {out_path} to {mp3_path}")
+        os.rename(out_path, mp3_path)
 
-            self.logger.info('Downloaded audio successfully, store at ' + mp3_path)
+        self.logger.info('Downloaded audio successfully, store at ' + mp3_path)
 
-        return mp3_path, True
+        return mp3_path
 
     @staticmethod
     def mp3_to_wav(mp3_path: str, wav_path: str=None) -> str:
@@ -102,7 +102,7 @@ class Downloader(StepMixin):
         Returns:
             path to downloaded .wav file
         """
-        mp3_path, status = self.download_mp3(url, save_dir=save_dir)
+        mp3_path = self.download_mp3(url, save_dir=save_dir)
         if os.path.splitext(mp3_path)[-1] == '.mp3':
             self.logger.info("Convert into .wav and resample audio")
             save_path = self.resample_wav(self.mp3_to_wav(mp3_path), target_sr=sampling_rate)

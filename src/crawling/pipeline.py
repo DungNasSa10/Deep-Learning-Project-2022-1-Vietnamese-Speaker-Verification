@@ -28,8 +28,8 @@ class Pipeline(StepMixin):
         self.logger.info("Start full process")
 
         voice_and_urls = get_voices_and_urls(csv_voice_filepath)
-        _, fn = os.path.split(csv_voice_filepath)
-        fn = os.path.join(save_dir, os.path.splitext(fn)[0] + "-urls-check-list.txt")
+        fn, _ = os.path.splitext(csv_voice_filepath)
+        fn = fn + "-urls-check-list.txt"
         if os.path.exists(fn) is False:
             self.logger.info(f"Create urls check list at file: {fn}")
             f = open(fn, 'w', encoding='utf-8')
