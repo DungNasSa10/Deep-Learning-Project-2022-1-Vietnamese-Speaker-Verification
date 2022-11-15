@@ -3,8 +3,11 @@ import sys
 sys.path.append(os.getcwd())
 
 from src.crawling.vad_processor import VADProcessor
+from src.crawling.downloader import Downloader
 
+d = Downloader()
 vad = VADProcessor()
 
-print(vad.vad("../../data/wav/Chu-Văn-Biên/Nội dung chương trình Vật lí 11_Thầy Chu Văn Biên.wav", sampling_rate=16000))
+wav_path = d.run('https://www.youtube.com/watch?v=dwrQeJLsl5Y&list=PLmyF-BPWWPTIXy_kCK5GvCZeZye_5Ny86&index=3', './data/wavs')
+print(vad.run(wav_path, sampling_rate=16000))
 

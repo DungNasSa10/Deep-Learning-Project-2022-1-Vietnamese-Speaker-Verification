@@ -12,98 +12,40 @@ class VADProcessor(StepMixin):
         self.model, utils = hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False)
         self.get_speech_timestamps, self.save_audio, self.read_audio, self.VADIterator, self.collect_chunks = utils
 
-    def vad(self, wav_path: str, sampling_rate: int=16000):
-        wav = self.read_audio(wav_path, sampling_rate = sampling_rate)
-        speech_timestamps = self.get_speech_timestamps(wav, self.model, threshold=0.5, sampling_rate=sampling_rate)
+        self.min_duration_in_seconds = 3
+        self.max_duration_in_seconds = 10
+        self.thresholds = (0.5, 0.9)
 
-        wav_duration = 0
-        k = 0   
-        speech_timestamps_concat = []
-        wav_concat = []
+    def vad(self, wav, sampling_rate: int, threshold: int, min_duration: int):
+        """
+        Args:
+            min_duration: int
+                min duration of splitted wav file, in seconds
+        """
+        min_duration *= sampling_rate 
+        speech_timestamps_chunks = []
+        wav_chunks = []
+        duration = 0
+        speech_timestamps = self.get_speech_timestamps(wav, self.model, threshold=threshold, sampling_rate=sampling_rate)
 
-        while(True):
-            wav_duration += speech_timestamps[k]['end'] - speech_timestamps[k]['start'] 
-            speech_timestamps_concat.append(speech_timestamps[k])
-                
-            if k < len(speech_timestamps)-1:
-                k += 1
-                if wav_duration >= 3 * sampling_rate:      
-                    wav_concat.append(self.collect_chunks(speech_timestamps_concat, wav))
-                    speech_timestamps_concat.clear()
-                    wav_duration = 0
-                    continue
-                else:
-                    continue
+        for ts in speech_timestamps:
+            duration += ts['end'] - ts['start']
+            speech_timestamps_chunks.append(ts)
+            if duration >= min_duration:
+                wav_chunks.append(speech_timestamps_chunks)
+                speech_timestamps_chunks = []
+                duration = 0
+
+        if duration > 0:
+            if len(wav_chunks) > 0:
+                wav_chunks.append(wav_chunks.pop() + speech_timestamps_chunks)
             else:
-                wav_concat.append(self.collect_chunks(speech_timestamps_concat, wav))
-                speech_timestamps_concat.clear()
-                wav_duration = 0
-                break   
-
-        wav_dir = os.path.splitext(wav_path)[0]
-        if not os.path.exists(wav_dir):
-            os.makedirs(wav_dir)
-            self.logger.warning("Create directory: " + wav_dir)
-
-        j = 0
-        self.logger.info("Start saving .wav files to " + wav_dir)
-        for i in wav_concat:
-            if not os.path.exists(os.path.join(wav_dir, str(j) + '.wav')):
-                self.logger.info("Save file " + os.path.join(wav_dir, str(j) + '.wav'))
-                self.save_audio(os.path.join(wav_dir, str(j) + '.wav'), i, sampling_rate = sampling_rate)
-            j += 1 
-
-        self.logger.info("Save .wav files successfully")
-        
-        files = get_wav_files(wav_dir)
-        j = len(files) + 1
-        self.logger.info(f"Detect {len(files)} .wav files in {wav_dir}")
-
-        for file in files:
-            y, sr = soundfile.read(file)
-            wav_length = len(y) / sr
-
-            if wav_length >= 10:
-                wav = self.read_audio(file, sampling_rate = sampling_rate)
-                speech_timestamps = self.get_speech_timestamps(wav, self.model, threshold=0.9, sampling_rate=sampling_rate)
-                wav_duration = 0
-                k = 0   
-                speech_timestamps_concat = []
-                wav_concat = []
-
-                if len(speech_timestamps) != 0:
-                    while(True):
-                        wav_duration =  wav_duration + speech_timestamps[k]['end'] - speech_timestamps[k]['start']
-                        
-                        speech_timestamps_concat.append(speech_timestamps[k])
-                        
-                        if k < len(speech_timestamps)-1:
-                            k += 1
-                            if wav_duration >= 3 * sampling_rate:      
-                                wav_concat.append(self.collect_chunks(speech_timestamps_concat, wav))
-                                speech_timestamps_concat.clear()
-                                wav_duration = 0
-                                continue
-                            else:
-                                continue
-                        else:
-                            wav_concat.append(self.collect_chunks(speech_timestamps_concat, wav))
-                            speech_timestamps_concat.clear()
-                            wav_duration = 0
-                            break
-                else:
-                    continue   
-
-                self.logger.info("Start saving .wav files to " + wav_dir)
-                for i in wav_concat:
-                    self.logger.info("Save file " + str(j) + '.wav')
-                    self.save_audio(os.path.join(wav_dir, str(j) + '.wav'), i, sampling_rate = sampling_rate)
-                    j += 1 
-
-        return wav_dir
+                wav_chunks.append(speech_timestamps_chunks)
+    
+        return [self.collect_chunks(chunks, wav) for chunks in wav_chunks]
 
     def remove_wav(self, wav_dir: str) -> str:
-        self.logger.info("Remove some unnecessary .wav file")
+        self.logger.info("Start removing some unnecessary .wav file in directory: " + wav_dir)
         files = get_wav_files(wav_dir)
         self.logger.info(f"Detect {len(files)} .wav files in {wav_dir}")
 
@@ -111,9 +53,11 @@ class VADProcessor(StepMixin):
             y, sr = soundfile.read(file)
             wav_length = len(y) / sr
 
-            if wav_length < 3 or wav_length > 10:
+            if wav_length < self.min_duration_in_seconds or wav_length > self.max_duration_in_seconds:
                 self.logger.warning("Remove " + file)
                 os.remove(file)
+        
+        self.logger.info("Finish removing some unnecessary .wav file")
         return wav_dir
 
     def run(self, wav_path: str, sampling_rate: int=16000) -> str:
@@ -124,7 +68,34 @@ class VADProcessor(StepMixin):
             directory where wav files are stored
         """
         self.logger.info("Start running VAD process with file: " + wav_path)
-        wav_dir = self.remove_wav(self.vad(wav_path, sampling_rate=sampling_rate))
+        
+        wav = self.read_audio(wav_path, sampling_rate = sampling_rate)
+        wav_dir = os.path.splitext(wav_path)[0]
+        if os.path.exists(wav_dir) is False:
+            os.makedirs(wav_dir)
+
+        wav_chunks = self.vad(wav, sampling_rate, self.thresholds[0], self.min_duration_in_seconds)
+        wav_index = 0
+        max_duration = self.max_duration_in_seconds * sampling_rate
+
+        def save_chunk(_chunk, index):
+            fpath = os.path.join(wav_dir, str(index) + ".wav")
+            self.logger.info('Save audio ' + fpath)
+            self.save_audio(fpath, _chunk, sampling_rate=sampling_rate)
+            return index + 1
+
+        for chunk in wav_chunks:
+            if len(chunk) < max_duration:
+                wav_index = save_chunk(chunk, wav_index)
+            else:
+                chunks = self.vad(chunk, sampling_rate, self.thresholds[1], self.min_duration_in_seconds)
+                for ch in chunks:
+                    wav_index = save_chunk(ch, wav_index)
+
+        self.remove_wav(wav_dir)
+        self.logger.warning("Remove file: " + wav_path)
+        os.remove(wav_path)
+
         self.logger.info("Finish VAD process")
 
         return wav_dir
