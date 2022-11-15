@@ -21,6 +21,15 @@ def get_logger(name: str):
     logger = logging.getLogger(name)
     logger.setLevel(LOG_LEVEL)
 
+    for handler in logging.root.handlers[:]:
+        print(type(handler))
+        logging.root.removeHandler(handler)
+
+    sh = logging.StreamHandler()
+    sh.setFormatter(__formatter)
+    sh.setLevel(LOG_LEVEL)
+    logger.addHandler(sh)
+
     global __log_file__
     if __log_file__ is None:
         __log_file__ = f"CRAWLER-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
