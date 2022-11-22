@@ -1,6 +1,5 @@
 import pandas as pd
 import os
-from glob2 import glob
 
 
 def get_voices_and_urls(filepath: str) -> list:
