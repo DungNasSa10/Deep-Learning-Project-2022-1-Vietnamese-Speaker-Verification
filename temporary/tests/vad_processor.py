@@ -1,6 +1,7 @@
 import os
 import sys
 sys.path.append(os.getcwd())
+sys.path.append(os.path.join(os.getcwd(), 'src'))
 
 from src.crawling.vad_processor import VADProcessor
 from src.crawling.downloader import Downloader
