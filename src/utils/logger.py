@@ -22,7 +22,6 @@ def get_logger(name: str):
     logger.setLevel(LOG_LEVEL)
 
     for handler in logging.root.handlers[:]:
-        print(type(handler))
         logging.root.removeHandler(handler)
 
     sh = logging.StreamHandler()
