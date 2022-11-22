@@ -1,9 +1,9 @@
 import os
-from ..utils.prepare_data import get_voices_and_urls
-from .mixin import StepMixin
-from .downloader import Downloader
-from .vad_processor import VADProcessor
-from .outlier_remover import OutlierRemover
+from utils.prepare_data import get_voices_and_urls
+from crawling.mixin import StepMixin
+from crawling.downloader import Downloader
+from crawling.vad_processor import VADProcessor
+from crawling.outlier_remover import OutlierRemover
 
 
 class Pipeline(StepMixin):

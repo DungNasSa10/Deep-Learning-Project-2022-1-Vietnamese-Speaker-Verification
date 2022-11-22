@@ -4,8 +4,7 @@ import librosa
 import soundfile
 from pytube import YouTube
 from typing import Tuple
-from ..utils.logger import get_logger
-from .mixin import StepMixin
+from crawling.mixin import StepMixin
 
 
 class Downloader(StepMixin):

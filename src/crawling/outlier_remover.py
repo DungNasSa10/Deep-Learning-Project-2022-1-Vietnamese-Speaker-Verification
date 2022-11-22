@@ -11,8 +11,8 @@ from speechbrain.pretrained import EncoderClassifier
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from .mixin import StepMixin
-from ..utils.prepare_data import get_wav_files
+from crawling.mixin import StepMixin
+from utils.prepare_data import get_wav_files
 
 
 class OutlierRemover(StepMixin):

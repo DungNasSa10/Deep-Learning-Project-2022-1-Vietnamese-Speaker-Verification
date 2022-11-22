@@ -1,8 +1,8 @@
 from torch import hub
-from ..utils.prepare_data import get_wav_files
+from utils.prepare_data import get_wav_files
 import os
 import soundfile
-from .mixin import StepMixin
+from crawling.mixin import StepMixin
 
 
 class VADProcessor(StepMixin):
