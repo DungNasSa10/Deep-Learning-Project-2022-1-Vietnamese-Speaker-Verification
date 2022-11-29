@@ -12,7 +12,7 @@ from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from crawling.mixin import StepMixin
-from utils.prepare_data import get_wav_files
+from utils.tools import get_wav_files
 
 
 class OutlierRemover(StepMixin):
@@ -22,8 +22,9 @@ class OutlierRemover(StepMixin):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.logger.info("Detect device: " + str(self.device))
         self.model = EncoderClassifier.from_hparams(source="speechbrain/spkrec-ecapa-voxceleb", run_opts={"device":self.device})
+        self.model.eval()
 
-    def run(self, wav_dir: str, threshold: float=0.45):
+    def run(self, wav_dir: str, threshold: float=0.45, sampling_rate: int=16000):
         """
         Args:
             wav_dir:
@@ -41,16 +42,16 @@ class OutlierRemover(StepMixin):
 
         self.logger.info("Calculate the embedding values of audio")
         with logging_redirect_tqdm():
-            for idx, file in tqdm(enumerate(files), total=len(files)):
+            for file in tqdm(files, total=len(files)):
                 signal, _  = torchaudio.load(file)
 
                 # Splited utterance matrix
-                max_audio = 3*16000
+                max_audio_length = 3 * sampling_rate # 3 seconds
                 feats = []
-                startframe = np.linspace(0, signal.shape[1] - max_audio, num=5)
+                startframe = np.linspace(0, signal.shape[1] - max_audio_length, num=5)
 
                 for asf in startframe:
-                    feat = signal[0, int(asf): int(asf) + max_audio]
+                    feat = signal[0, int(asf): int(asf) + max_audio_length]
                     feats.append(feat)
 
                 feats = np.stack(feats, axis = 0).astype('f')
@@ -90,5 +91,5 @@ class OutlierRemover(StepMixin):
             for i, file in tqdm(enumerate(files), total=len(files)):
                 if mean_scores[i] < threshold:
                     # print(mean_scores[i], file)
-                    self.logger.warning("Remove " + file)
+                    self.logger.warning("\tRemove " + file)
                     os.remove(file)
