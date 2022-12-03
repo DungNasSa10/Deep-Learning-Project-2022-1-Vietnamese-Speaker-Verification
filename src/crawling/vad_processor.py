@@ -1,5 +1,5 @@
 from torch import hub
-from utils.prepare_data import get_wav_files
+from utils.tools import get_wav_files
 import os
 import soundfile
 from crawling.mixin import StepMixin
@@ -7,10 +7,10 @@ from crawling.mixin import StepMixin
 
 class VADProcessor(StepMixin):
     def __init__(self) -> None:
-        super().__init__() 
-        
+        super().__init__()
+
         self.model, utils = hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False)
-        self.get_speech_timestamps, self.save_audio, self.read_audio, self.VADIterator, self.collect_chunks = utils
+        self.fn_get_speech_timestamps, self.fn_save_audio, self.fn_read_audio, self.VADIterator, self.fn_collect_chunks = utils
 
         self.min_duration_in_seconds = 3
         self.max_duration_in_seconds = 10
@@ -22,14 +22,14 @@ class VADProcessor(StepMixin):
             min_duration: int
                 min duration of splitted wav file, in seconds
         """
-        min_duration *= sampling_rate 
+        min_duration *= sampling_rate
         speech_timestamps_chunks = []
         wav_chunks = []
         duration = 0
-        speech_timestamps = self.get_speech_timestamps(wav, self.model, threshold=threshold, sampling_rate=sampling_rate)
+        speech_timestamps = self.fn_get_speech_timestamps(wav, self.model, threshold=threshold, sampling_rate=sampling_rate)
 
         for ts in speech_timestamps:
-            duration += ts['end'] - ts['start']
+            duration += ts["end"] - ts["start"]
             speech_timestamps_chunks.append(ts)
             if duration >= min_duration:
                 wav_chunks.append(speech_timestamps_chunks)
@@ -41,10 +41,13 @@ class VADProcessor(StepMixin):
                 wav_chunks.append(wav_chunks.pop() + speech_timestamps_chunks)
             else:
                 wav_chunks.append(speech_timestamps_chunks)
-    
-        return [self.collect_chunks(chunks, wav) for chunks in wav_chunks]
 
-    def remove_wav(self, wav_dir: str) -> str:
+        return [self.fn_collect_chunks(chunks, wav) for chunks in wav_chunks]
+
+    def __remove_wav(self, wav_dir: str) -> str:
+        """
+        Remove .wav files that their lengths are outside a fix inteval
+        """
         self.logger.info("Start removing some unnecessary .wav file in directory: " + wav_dir)
         files = get_wav_files(wav_dir)
         self.logger.info(f"Detect {len(files)} .wav files in {wav_dir}")
@@ -54,22 +57,21 @@ class VADProcessor(StepMixin):
             wav_length = len(y) / sr
 
             if wav_length < self.min_duration_in_seconds or wav_length > self.max_duration_in_seconds:
-                self.logger.warning("Remove " + file)
+                self.logger.warning("\tRemove " + file)
                 os.remove(file)
-        
-        self.logger.info("Finish removing some unnecessary .wav file")
-        return wav_dir
 
-    def run(self, wav_path: str, sampling_rate: int=16000) -> str:
+        self.logger.info("Finish removing some unnecessary .wav file")
+
+    def run(self, wav_path: str, sampling_rate: int = 16000) -> str:
         """
         Args:
-        
+
         Returns:
             directory where wav files are stored
         """
         self.logger.info("Start running VAD process with file: " + wav_path)
-        
-        wav = self.read_audio(wav_path, sampling_rate = sampling_rate)
+
+        wav = self.fn_read_audio(wav_path, sampling_rate=sampling_rate)
         wav_dir = os.path.splitext(wav_path)[0]
         if os.path.exists(wav_dir) is False:
             os.makedirs(wav_dir)
@@ -80,8 +82,8 @@ class VADProcessor(StepMixin):
 
         def save_chunk(_chunk, index):
             fpath = os.path.join(wav_dir, str(index) + ".wav")
-            self.logger.info('Save audio ' + fpath)
-            self.save_audio(fpath, _chunk, sampling_rate=sampling_rate)
+            self.logger.info("\tSave audio " + fpath)
+            self.fn_save_audio(fpath, _chunk, sampling_rate=sampling_rate)
             return index + 1
 
         for chunk in wav_chunks:
@@ -92,8 +94,8 @@ class VADProcessor(StepMixin):
                 for ch in chunks:
                     wav_index = save_chunk(ch, wav_index)
 
-        self.remove_wav(wav_dir)
-        self.logger.warning("Remove file: " + wav_path)
+        self.__remove_wav(wav_dir)
+        self.logger.warning("\tRemove file: " + wav_path)
         os.remove(wav_path)
 
         self.logger.info("Finish VAD process")

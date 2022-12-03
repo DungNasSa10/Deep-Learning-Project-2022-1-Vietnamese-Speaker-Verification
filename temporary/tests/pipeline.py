@@ -7,4 +7,5 @@ from src.crawling.pipeline import Pipeline
 
 p = Pipeline()
 
-p.run('./data/Voice list - Long.csv')
+# p.run('./data/Voice list - Long.csv')
+p.run('https://drive.google.com/file/d/1BL4tkLkPPDeuYwlCaMvIrKYCst8E4zEN/view?usp=share_link')

@@ -126,16 +126,14 @@ class Downloader(StepMixin):
     def run(self, url: str, save_dir: str, sampling_rate: int=16000, remove_mp3: bool=True):
         """
         Returns:
-            path to downloaded .wav file
+            path to downloaded .wav path
         """
         mp3_path = self.download_mp3(url, save_dir, Downloader.MAX_TIME_IN_MIN)
-        if os.path.splitext(mp3_path)[-1] == '.mp3':
-            self.logger.info("Convert into .wav and resample audio")
-            save_path = self.resample_wav(self.mp3_to_wav(mp3_path), target_sr=sampling_rate)
+        self.logger.info("Convert into .wav and resample audio")
+        save_path = self.resample_wav(self.mp3_to_wav(mp3_path), target_sr=sampling_rate)
 
-            if remove_mp3:
-                self.logger.info("Remove " + mp3_path)
-                os.remove(mp3_path)
-        
-            return save_path
-        return mp3_path
+        if remove_mp3:
+            self.logger.info("Remove " + mp3_path)
+            os.remove(mp3_path)
+    
+        return save_path
