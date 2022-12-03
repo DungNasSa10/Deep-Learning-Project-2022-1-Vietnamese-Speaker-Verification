@@ -2,6 +2,7 @@ import os
 import subprocess
 import librosa
 import soundfile
+from pydub import AudioSegment
 from pytube import YouTube
 from typing import Tuple
 from crawling.mixin import StepMixin
@@ -20,15 +21,33 @@ class Downloader(StepMixin):
                     *.mp3
     """
 
-    def __init__(self) -> None:
-        super().__init__()        
+    MAX_TIME_IN_MIN = 25
 
-    def download_mp3(self, url: str, save_dir: str) -> Tuple[str, bool]:
+    def __init__(self) -> None:
+        super().__init__()
+
+    def trim_mp3(self, mp3_path: str, max_time_in_min: float) -> None:
+        """ Trim mp3 file if it is very long
+
+        Args:
+            out_path: path of mp3 file
+            max_time_in_minutes: max time in minutes of mp3 file
+        """
+        end_time = max_time_in_min * 60
+        base, _ = os.path.splitext(mp3_path)
+        trimmed_mp3_path = base + '_trimmed.mp3'
+        subprocess.call(['ffmpeg', '-ss', '0', '-t', f'{end_time}', '-i', mp3_path, trimmed_mp3_path])
+        os.remove(mp3_path)
+
+        return trimmed_mp3_path
+
+    def download_mp3(self, url: str, save_dir: str, max_time_in_min: float) -> Tuple[str, bool]:
         """
         Args:
             url: url of Youtube video
             save_dir: save directory
-        
+            max_time_in_min: max time of mp3 file in minutes
+
         Returns:
             file path of mp3 file
         """
@@ -59,6 +78,12 @@ class Downloader(StepMixin):
         os.rename(out_path, mp3_path)
 
         self.logger.info('Downloaded audio successfully, store at ' + mp3_path)
+
+        ### trim mp3 file
+        if yt.length > Downloader.MAX_TIME_IN_MIN * 60:
+            trimmed_mp3_path = self.trim_mp3(mp3_path, max_time_in_min)
+            
+            return trimmed_mp3_path
 
         return mp3_path
 
@@ -101,7 +126,7 @@ class Downloader(StepMixin):
         Returns:
             path to downloaded .wav file
         """
-        mp3_path = self.download_mp3(url, save_dir=save_dir)
+        mp3_path = self.download_mp3(url, save_dir, Downloader.MAX_TIME_IN_MIN)
         if os.path.splitext(mp3_path)[-1] == '.mp3':
             self.logger.info("Convert into .wav and resample audio")
             save_path = self.resample_wav(self.mp3_to_wav(mp3_path), target_sr=sampling_rate)
