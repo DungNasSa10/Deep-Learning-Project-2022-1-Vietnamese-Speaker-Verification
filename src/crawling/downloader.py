@@ -2,7 +2,6 @@ import os
 import subprocess
 import librosa
 import soundfile
-from pydub import AudioSegment
 from pytube import YouTube
 from typing import Tuple
 from crawling.mixin import StepMixin

@@ -5,6 +5,7 @@ from crawling.downloader import Downloader
 from crawling.vad_processor import VADProcessor
 from crawling.outlier_remover import OutlierRemover
 from utils.tools import is_gg_drive_url
+import time
 
 
 class Pipeline(StepMixin):
@@ -15,18 +16,24 @@ class Pipeline(StepMixin):
         self.vad_processor = VADProcessor()
         self.outlier_remover = OutlierRemover()
 
-    def run(self, filepath_or_url: str, save_dir: str='./data/wavs', sampling_rate: int=16000, remove_mp3: bool=True, ):
+    def run(self, filepath_or_url: str, save_dir: str='./data/wavs', sampling_rate: int=16000, remove_mp3: bool=True, time_limit: int=None):
         """
         Args:
             filepath: str \
                 csv voide file path
             save_dir: str \
                 directory to save .wav file
-            remove_mp3: 
-                remove old mp3 files or not
             sampling_rate: int, default = 16000 \
                 sampling rate of .wav file
+            remove_mp3: bool, default = False
+                remove old mp3 files or not
+            time_limit:
+                time limit in seconds
+            
         """
+        if time_limit is not None:
+            __start_time = time.time()
+
         self.logger.info("Start full process")
 
         voice_and_urls = get_voices_and_urls(filepath_or_url)
@@ -55,6 +62,8 @@ class Pipeline(StepMixin):
             f = open(fn, 'a', encoding='utf-8')
             f.write(url + '\n')
             f.close()
+        
+        __stop = False
 
         for voice, urls in voice_and_urls:
             self.logger.info("Start downloading videos of voice: " + voice)
@@ -74,6 +83,14 @@ class Pipeline(StepMixin):
                 self.outlier_remover.run(wav_dir, sampling_rate=sampling_rate)
 
                 insert_url(url)
-            self.logger.info("Finish processing for voice: " + voice)
 
+                if time_limit is not None:
+                    __duration = time.time() - __start_time
+                    if __duration >= time_limit:
+                        __stop = True
+                        self.logger.warning(f"Stop after {__duration} seconds because time limit excceed")
+                        break
+            if __stop:
+                break
+            self.logger.info("Finish processing for voice: " + voice)
         self.logger.info("Finish full process")
