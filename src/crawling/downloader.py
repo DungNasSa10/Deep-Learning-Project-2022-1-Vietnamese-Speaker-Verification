@@ -115,10 +115,12 @@ class Downloader(StepMixin):
             path to resampled wav file
         """
         save_path   = wav_path if save_path is None else save_path
-        y, sr       = librosa.load(wav_path)       
+        y, sr       = librosa.load(wav_path)
         y_k         = librosa.resample(y, orig_sr=sr, target_sr=target_sr)
         y_mono      = librosa.to_mono(y_k)
+
         soundfile.write(save_path, y_mono, target_sr)
+
         return save_path
 
     def run(self, url: str, save_dir: str, sampling_rate: int=16000, remove_mp3: bool=True):
