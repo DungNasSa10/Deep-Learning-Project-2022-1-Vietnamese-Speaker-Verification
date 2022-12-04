@@ -25,7 +25,7 @@ class Pipeline(StepMixin):
                 directory to save .wav file
             sampling_rate: int, default = 16000 \
                 sampling rate of .wav file
-            remove_mp3: bool, default = False
+            remove_mp3: bool, default = True
                 remove old mp3 files or not
             time_limit:
                 time limit in seconds
