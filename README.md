@@ -11,6 +11,7 @@ pip install -r requirements.txt
 + Change path for urls file
 ```
 python src/crawl.py -f https://drive.google.com/file/d/1BL4tkLkPPDeuYwlCaMvIrKYCst8E4zEN/view?usp=share_link -d ./data/train -sr 16000
+```
 
 ## Pipeline: 
 + Data Preprocessing: 
