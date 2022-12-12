@@ -2,8 +2,8 @@
 
 ## Installation 
 ```
-conda create -n amsv python=3.8 -y
-conda activate amsv
+conda create -n dlds python=3.8 -y
+conda activate dlds
 pip install -r requirements.txt
 ```
 
