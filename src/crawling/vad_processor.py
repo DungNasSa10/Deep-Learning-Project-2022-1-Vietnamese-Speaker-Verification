@@ -9,7 +9,7 @@ class VADProcessor(StepMixin):
     def __init__(self) -> None:
         super().__init__()
 
-        self.model, utils = hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False)
+        self.model, utils = hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False, onnx=True)
         self.fn_get_speech_timestamps, self.fn_save_audio, self.fn_read_audio, self.VADIterator, self.fn_collect_chunks = utils
 
         self.min_duration_in_seconds = 3

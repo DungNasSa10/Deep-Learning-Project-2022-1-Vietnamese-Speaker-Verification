@@ -2,6 +2,8 @@ logs
 **.temp.**
 **_temp.**
 pretrained_models
+notebooks
+**.bkp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

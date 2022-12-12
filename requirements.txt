@@ -1,5 +1,14 @@
 soundfile
 librosa
 pytube
+torch 
+torchaudio
 pandas
+scipy
+tqdm
+scikit-learn
+asteroid-filterbanks
+pyyaml
 speechbrain
+onnxruntime
+
