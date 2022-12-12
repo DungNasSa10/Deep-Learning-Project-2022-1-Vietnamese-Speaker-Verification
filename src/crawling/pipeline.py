@@ -4,7 +4,6 @@ from crawling.mixin import StepMixin
 from crawling.downloader import Downloader
 from crawling.vad_processor import VADProcessor
 from crawling.outlier_remover import OutlierRemover
-from utils.tools import is_gg_drive_url
 import time
 
 
@@ -16,7 +15,7 @@ class Pipeline(StepMixin):
         self.vad_processor = VADProcessor()
         self.outlier_remover = OutlierRemover()
 
-    def run(self, filepath_or_url: str, save_dir: str='./data/wavs', sampling_rate: int=16000, remove_mp3: bool=True, time_limit: int=None):
+    def run(self, filepath_or_url: str, save_dir: str='./data/train', sampling_rate: int=16000, remove_mp3: bool=True, time_limit: int=None):
         """
         Args:
             filepath: str \
@@ -25,7 +24,7 @@ class Pipeline(StepMixin):
                 directory to save .wav file
             sampling_rate: int, default = 16000 \
                 sampling rate of .wav file
-            remove_mp3: bool, default = False
+            remove_mp3: bool, default = True
                 remove old mp3 files or not
             time_limit:
                 time limit in seconds
@@ -37,6 +36,8 @@ class Pipeline(StepMixin):
         self.logger.info("Start full process")
 
         voice_and_urls = get_voices_and_urls(filepath_or_url)
+        num_urls = sum([len(urls) for _, urls in voice_and_urls])
+
         fn = os.path.basename(filepath_or_url)
         removal = '\/%^&$?*#'
         fn = "".join([t for t in fn if t not in removal])
@@ -62,7 +63,8 @@ class Pipeline(StepMixin):
             f = open(fn, 'a', encoding='utf-8')
             f.write(url + '\n')
             f.close()
-        
+
+        cnt_url = 0
         __stop = False
 
         for voice, urls in voice_and_urls:
@@ -74,6 +76,9 @@ class Pipeline(StepMixin):
                 os.makedirs(directory)
             
             for url in urls:
+                cnt_url += 1
+                self.logger.info(f"Url number {cnt_url}/{num_urls}")
+
                 if url in get_processed_urls():
                     self.logger.warning(f"Skip url {url} because it has finished the process")
                     continue
