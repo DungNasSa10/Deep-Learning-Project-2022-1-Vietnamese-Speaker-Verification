@@ -2,7 +2,7 @@ import torch
 import torchaudio
 import torch.nn as nn
 import torch.nn.functional as F
-from SqeezeAndExcitation import *
+from model_utils import *
 
 
 class ResNetSE(nn.Module):
@@ -10,6 +10,8 @@ class ResNetSE(nn.Module):
         super(ResNetSE, self).__init__()
 
         print('Embedding size is %d, encoder %s.'%(nOut, encoder_type))
+
+        self.specaug = FbankAug() # Spec augmentation
         
         self.inplanes   = num_filters[0]
         self.encoder_type = encoder_type
@@ -80,12 +82,18 @@ class ResNetSE(nn.Module):
         nn.init.xavier_normal_(out)
         return out
 
-    def forward(self, x):
+    def forward(self, x, aug=False):
 
         with torch.no_grad():
             with torch.cuda.amp.autocast(enabled=False):
                 x = self.torchfb(x)+1e-6
-                if self.log_input: x = x.log()
+
+                if self.log_input: 
+                    x = x.log()
+
+                if aug == True:
+                    x = self.specaug(x)
+                    
                 x = self.instancenorm(x).unsqueeze(1)
 
         x = self.conv1(x)
