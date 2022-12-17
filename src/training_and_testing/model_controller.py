@@ -136,6 +136,10 @@ class ModelTrainer(object):
 
         return scores, labels
 
+    ## ===== ===== ===== ===== ===== ===== ===== =====
+    ## Evaluate from list
+    ## ===== ===== ===== ===== ===== ===== ===== =====
+
     def test_from_list(self, test_list, test_path, output_path, **kwargs):
         self.__model__.eval()
         files = []
