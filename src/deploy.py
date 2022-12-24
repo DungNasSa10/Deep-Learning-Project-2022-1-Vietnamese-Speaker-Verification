@@ -1,6 +1,9 @@
 import streamlit as st
 import subprocess
 import os
+import time
+import hashlib
+import random
 
 
 def upload_wavs():
@@ -42,6 +45,17 @@ def create_test_list(wav_paths: list, output_file: str):
     f.close()
 
 
+def get_id(file_path):
+    dr, fn = os.path.split(file_path)
+    _hash = hashlib.sha256(f"{str(time.time())} {fn} {str(random.randint(1, 1000000))}".encode('utf-8')).hexdigest()
+    p = os.path.join(dr, _hash[:16] + "-" + fn)
+    return p
+
+
+def convert_to_id(wav_paths: list):
+    return [get_id(wp) for wp in wav_paths]
+
+
 def predict(wav_paths: list):
     wav_paths = clean_duplicate(wav_paths)
 
@@ -49,8 +63,10 @@ def predict(wav_paths: list):
         st.warning("You must choose more audio files and remove duplicated files if exist")
         return
 
-    test_list = "data/tmp/test_list.txt"
+    wav_paths = convert_to_id(wav_paths)
 
+    test_list = "data/tmp/test_list.txt"
+    test_list = get_id(test_list)
     create_test_list(wav_paths, test_list)
 
     subprocess.check_call([
