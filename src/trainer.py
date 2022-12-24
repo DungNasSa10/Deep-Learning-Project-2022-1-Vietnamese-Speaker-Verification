@@ -115,11 +115,14 @@ def main():
     os.makedirs(args.model_save_path, exist_ok=True)
     os.makedirs(args.result_save_path, exist_ok=True)
 
-    n_gpus = torch.cuda.device_count()
+    args.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     print('Python Version:', sys.version)
     print('PyTorch Version:', torch.__version__)
-    print('Number of GPUs:', torch.cuda.device_count())
+    print(f"Detected device: {args.device}")
+    if args.device == "cuda":
+        n_gpus = torch.cuda.device_count()
+        print('Number of GPUs:', n_gpus)
     print('Save path:',args.save_path)
 
     if args.distributed:

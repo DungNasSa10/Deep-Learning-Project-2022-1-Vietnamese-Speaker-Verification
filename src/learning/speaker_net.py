@@ -22,7 +22,7 @@ class WrappedModel(nn.Module):
 
 class SpeakerNet(nn.Module):
 
-    def __init__(self, model: nn.Module, loss_function: str = "aamsoftmax", n_per_speaker: int = 1, **kwargs) -> None:
+    def __init__(self, model: nn.Module, loss_function: str = "aamsoftmax", n_per_speaker: int = 1, device: str = 'cuda', **kwargs) -> None:
         
         super().__init__()
 
@@ -34,9 +34,11 @@ class SpeakerNet(nn.Module):
 
         self.n_per_speaker = n_per_speaker
 
+        self.device = device
+
     def forward(self, data: torch.tensor, label = None):
         
-        data = data.reshape(-1, data.size()[-1]).cuda()
+        data = data.reshape(-1, data.size()[-1]).to(self.device)
         if isinstance(self.__model__, ECAPA_TDNN):
             output = self.__model__(data, aug=True)
         else:

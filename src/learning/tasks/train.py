@@ -13,10 +13,12 @@ from .model_controller import ModelColtroller
 
 
 warnings.simplefilter("ignore")
-torch.backends.cudnn.benchmark = True
 
 
 def train(rank: int, ngpus_per_node: int, args):
+    if args.device == "cuda":
+        torch.backends.cudnn.benchmark = True
+
     speaker_model = SpeakerNet(**vars(args))
 
     if args.distributed:
@@ -33,7 +35,7 @@ def train(rank: int, ngpus_per_node: int, args):
         print("Loaded the model on GPU {:d}".format(rank))
 
     else:
-        speaker_model = WrappedModel(speaker_model).cuda(rank)
+        speaker_model = WrappedModel(speaker_model).to(args.device)
 
     num_init_steps = 1
     eers = [100]
