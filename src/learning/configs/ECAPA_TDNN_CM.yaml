@@ -1,0 +1,16 @@
+model: ECAPA_TDNN
+C: 1024
+n_out: 192
+n_classes: 17714
+batch_size: 64
+trainfunc: cosinemargin
+max_seg_per_spk: 200
+augment: True
+max_epoch: 100
+save_path: output/ecapa
+train_list: data/MSV_CommonVoice_data/metadata/all_new_metadata.txt
+train_path: data/MSV_CommonVoice_data
+test_list: data/private_test/amsv-private-test/test_pairs/sample_t1/vietnam_private_pairs.csv
+test_path: data/private_test/amsv-private-test/t1/Vietnam_Test
+output_path: output/submission/t1/private_test
+# lr: 0.00001

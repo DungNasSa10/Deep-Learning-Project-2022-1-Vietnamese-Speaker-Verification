@@ -1,0 +1,71 @@
+dataloader:
+  max_frames: 200             # Input length to the network for training
+  eval_frames: 200
+  batch_size: 200
+  max_seg_per_spk: 500        # max segment per speaker
+  nDataLoaderThread: 4
+  augment: False
+  seed: 10
+
+train:
+  test_interval: 1            # may be boolean
+  max_epoch: 100
+  trainfunc: ""
+  train_list: ".txt"
+  test_list: ".txt"
+  train_path: "<dir>"
+  test_path: "<dir>"
+  musan_path: "<dir>"
+  rir_path: "<dir>"
+  output_path: "<dir>"
+
+test:
+  eval_only: False
+  test_only: False
+  freeze: False
+  unfreeze_embedding: False
+
+optimizer:
+  optimizer: "adam"
+  lr: 0.001                   # learing reate
+  lr_decay: 0.95
+  weight_decay: 0.00002
+
+scheduler:
+  scheduler: "steplr"
+  lr_step: 2
+  step_size_up: 20000
+  step_size_down: 20000
+  cyclic_mode: "triangular2"
+
+loss_fn:
+  hard_prob: 0.5              # Hard negative mining probability, otherwise random, only for some loss functions
+  hard_rank: 10
+  margin: 0.2
+  scale: 30
+  n_per_speaker: 1
+  n_classes: 17714
+
+eval_param:
+  dcf_p_target: 0.05
+  dcf_c_miss: 1.0
+  dcf_c_fa: 1.0
+
+initial_model: ""
+save_path: "exps/exp1"
+
+model: 
+  n_mels: 80
+  log_input: False
+  model: ""
+  encoder_type: "SAP"
+  n_out: 512
+  sinc_stride: 10
+  C: 1024
+
+distributed:
+  port: 8888
+  distributed: False
+  mixedprec: False
+
+  

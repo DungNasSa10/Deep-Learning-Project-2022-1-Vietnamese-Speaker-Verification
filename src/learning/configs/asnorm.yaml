@@ -1,0 +1,11 @@
+model: ECAPA_TDNN
+n_out: 192
+n_classes: 17714
+batch_size: 32
+trainfunc: aamsoftmax
+# Change language here
+embedding_file_path: output/embedding_data/vietnam_private_embeddings_file.pickle
+embedding_full_file_path: output/embedding_data/vietnam_private_embeddings_full_file.pickle
+save_temporary_path: output/submission/t1/private_test/vietnam_private_pairs.csv
+test_list: data/private_test/amsv-private-test/test_pairs/sample_t1/vietnam_private_pairs.csv
+test_path: data/private_test/amsv-private-test/t1/Vietnam_Test
