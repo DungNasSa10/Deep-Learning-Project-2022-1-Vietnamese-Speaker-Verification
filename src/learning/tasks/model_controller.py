@@ -128,7 +128,7 @@ class ModelTrainer(object):
             score_1 = torch.mean(torch.matmul(embedding_11, embedding_21.T)) # higher is positive
             score_2 = torch.mean(torch.matmul(embedding_12, embedding_22.T))
             score = (score_1 + score_2) / 2
-            score = score.detach().cpu().np()
+            score = score.detach().cpu().numpy()
             scores.append(score)
             labels.append(int(line.split()[0]))
 
@@ -183,7 +183,7 @@ class ModelTrainer(object):
             score_1 = torch.mean(torch.matmul(embedding_11, embedding_21.T)) # higher is positive
             score_2 = torch.mean(torch.matmul(embedding_12, embedding_22.T))
             score = (score_1 + score_2) / 2
-            score = score.detach().cpu().np()
+            score = score.detach().cpu().numpy()
             
             f_write.write(line.split()[0] + '\t' + line.split()[1] + '\t' + str(score) + '\n')
 

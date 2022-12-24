@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "RawNet3_ASP_AS",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/trainer.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--model",          "RawNet3",
+                "--encoder_type",   "ASP",
+                "--nClasses",       "1015",
+                "--batch_size",     "16",
+                "--trainfunc",      "aamsoftmax",
+                "--augment",        "True",
+                "--max_epoch",      "50",
+                "--save_path",      "/kaggle/working/RawNet3_ASP_AS",
+                "--train_list",     "/kaggle/input/vietnamese-speaker-verification/new_metadata/new_metadata/train/training_metadata.txt",
+                "--train_path",     "/kaggle/input/vietnamese-speaker-verification/data",
+                "--test_list",      "/kaggle/input/vietnamese-speaker-verification/new_metadata/new_metadata/test/labels/public_test_pairs_with_label.txt",
+                "--test_path",      "/kaggle/input/vietnamese-speaker-verification/data/data/test/sv_vlsp_2021/public_test/competition_public_test",
+                "--musan_path",     "/kaggle/input/vietnamese-speaker-verification/data/data/musan_augment",
+                "--rir_path",       "/kaggle/input/vietnamese-speaker-verification/data/data/rirs_noises",
+                "--output_path",    "/kaggle/working/RawNet3_ASP_AS",
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+    ]
+}
