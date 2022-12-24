@@ -1,6 +1,5 @@
 import os
 import warnings
-import importlib
 import glob
 import time
 
@@ -10,7 +9,7 @@ import torch.distributed as dist
 from learning.speaker_net import SpeakerNet, WrappedModel
 from learning.dataset import TrainDataset, TrainDataSampler, worker_init_fn
 from learning.metrics import tune_threshold_from_score
-from .model_controller import ModelTrainer
+from .model_controller import ModelColtroller
 
 
 warnings.simplefilter("ignore")
@@ -43,49 +42,21 @@ def train(rank: int, ngpus_per_node: int, args):
     if rank == 0:
         score_file = open(args.result_save_path + "/scores.txt", "a+")
 
-    ### Initialise trainer and data loader
-    train_dataset = TrainDataset(**vars(args))
-    train_sampler = TrainDataSampler(train_dataset, **vars(args))
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset,
-        batch_size=args.batch_size,
-        num_workers=args.nDataLoaderThread,
-        sampler=train_sampler,
-        # shuffle=True,
-        pin_memory=True,
-        worker_init_fn=worker_init_fn,
-        drop_last=True,
-    )
+    if args.train:
+        ### Initialise trainer and data loader
+        train_dataset = TrainDataset(**vars(args))
+        train_sampler = TrainDataSampler(train_dataset, **vars(args))
+        train_loader = torch.utils.data.DataLoader(
+            train_dataset,
+            batch_size=args.batch_size,
+            num_workers=args.nDataLoaderThread,
+            sampler=train_sampler,
+            pin_memory=True,
+            worker_init_fn=worker_init_fn,
+            drop_last=True,
+        )
 
-    trainer = ModelTrainer(speaker_model, gpu=rank, **vars(args))
-
-    if args.freeze:
-        model = trainer.__model__.module.__S__
-
-        if args.unfreeze_embedding:
-            for param in model.parameters():
-                param.requires_grad = False
-
-                model.fc6.weight.requires_grad = True
-                model.fc6.bias.requires_grad = True
-                model.bn6.weight.requires_grad = True
-                model.bn6.bias.requires_grad = True
-
-            plist = [
-                {"params": model.fc6.parameters(), "lr": 5e-6},
-                {"params": model.bn6.parameters(), "lr": 5e-6},
-                {"params": trainer.__model__.module.__L__.parameters(), "lr": 0.001},
-            ]
-        else:
-            plist = [{"params": trainer.__model__.module.__L__.parameters(), "lr": 0.001}]
-
-        ### Optimizer ahd scheduler
-        optimizer_init = importlib.import_module("optimizer." + args.optimizer).__getattribute__("optimizer_init")
-        trainer.__optimizer__ = optimizer_init(plist, **vars(args))
-
-        scheduler_init = importlib.import_module("scheduler." + args.scheduler).__getattribute__("scheduler_init")
-        del args.optimizer
-        trainer.__scheduler__, trainer.lr_step = scheduler_init(trainer.__optimizer__, **vars(args))
+    trainer = ModelColtroller(speaker_model, gpu=rank, **vars(args))
 
     ### Load model weights
     model_files = glob.glob("%s/model0*.model" % args.model_save_path)

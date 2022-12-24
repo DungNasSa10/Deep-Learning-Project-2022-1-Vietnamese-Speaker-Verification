@@ -81,11 +81,10 @@ def get_args():
     parser.add_argument('--sinc_stride',        type=int,   default=10,     help='Stride size of the first analytic filterbank layer of RawNet3')
     parser.add_argument('--C',                  type=int,   default=1024,   help='Channel size for the speaker encoder (ECAPA_TDNN)')
 
-    ## For test only
+    ## For train / eval / test only
+    parser.add_argument('--train',              dest='train',               action='store_true', help='Train only')
     parser.add_argument('--eval',               dest='eval',                action='store_true', help='Eval only')
     parser.add_argument('--test',               dest='test',                action='store_true', help='Test only')
-    parser.add_argument('--freeze',             dest='freeze',              action='store_true')
-    parser.add_argument('--unfreeze_embedding', dest='unfreeze_embedding',  action='store_true')
 
     ## Distributed and mixed precision training
     parser.add_argument('--port',               type=str,           default="8888",         help='Port for distributed training, input as text')
