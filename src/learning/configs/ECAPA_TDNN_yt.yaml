@@ -1,0 +1,10 @@
+model: ECAPA_TDNN
+C: 1024
+n_out: 192
+batch_size: 64
+trainfunc: aamsoftmax
+max_seg_per_spk: 200
+augment: False
+youtube_path: data/MSV_Youtube_data/vi
+save_file: data/MSV_Youtube_data/clustering_each_vid/train_list_vi.txt
+initial_model: output/ecapa/model/model000000034.model

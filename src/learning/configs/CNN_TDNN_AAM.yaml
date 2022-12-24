@@ -1,0 +1,16 @@
+model: ECAPA_TDNN
+C: 1024
+n_out: 192
+n_classes: 17714
+batch_size: 64
+trainfunc: aamsoftmax
+max_seg_per_spk: 200
+augment: True
+max_epoch: 100
+save_path: output/ecapa
+train_list: data/MSV_CommonVoice_data/metadata/all_new_metadata.txt
+train_path: data/MSV_CommonVoice_data
+test_list: data/Test/veri_test2.txt
+test_path: data/Test/wav
+output_path: output/submission/t1
+# lr: 0.00001
