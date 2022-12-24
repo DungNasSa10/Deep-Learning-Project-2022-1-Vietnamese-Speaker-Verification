@@ -1,0 +1,16 @@
+model: SEResNet34
+encoder_type: ASP
+trainfunc: aamsoftmax
+nClasses: 1015
+batch_size: 16
+max_seg_per_spk: 1000
+augment: True
+max_epoch: 2
+save_path: output/ResNetSE34V2_SAP_AAM
+train_list: data/metadata/train/training_metadata.txt
+train_path: ./
+test_list: data/metadata/test/sample_test_pairs.txt
+test_path: data/test/sv_vlsp_2021/public_test/competition_public_test
+musan_path: data/musan_augment
+rir_path: data/rirs_noises
+output_path: output/testing_results/public_test

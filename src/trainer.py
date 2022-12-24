@@ -64,13 +64,13 @@ def get_args():
     parser.add_argument('--save_path',          type=str,   default="exps/exp1",    help='Path for model and logs')
 
     ## Training and test data
-    parser.add_argument('--train_list',         type=str,   default="data/MSV_CommonVoice_data/metadata/all_new_metadata2.txt",     help='Train list')
-    parser.add_argument('--test_list',          type=str,   default="data/Test/veri_test2.txt",                                     help='Evaluation list')
-    parser.add_argument('--train_path',         type=str,   default="D:/Data/MSV_CommonVoice_data/",           help='Absolute path to the train set')
-    parser.add_argument('--test_path',          type=str,   default="data/Test/wav",                                                help='Absolute path to the test set')
+    parser.add_argument('--train_list',         type=str,   default="data/metadata/train/training_metadata.txt",                    help='Train list')
+    parser.add_argument('--test_list',          type=str,   default="data/metadata/test/test_pairs/public_test_pairs.txt",          help='Evaluation list')
+    parser.add_argument('--train_path',         type=str,   default="./",                                                           help='Absolute path to the train set')
+    parser.add_argument('--test_path',          type=str,   default="data/test/sv_vlsp_2021/public_test/competition_public_test",   help='Absolute path to the test set')
     parser.add_argument('--musan_path',         type=str,   default="data/musan_augment/",                                          help='Absolute path to the test set')
     parser.add_argument('--rir_path',           type=str,   default="data/rirs_noises/",                                            help='Absolute path to the test set')
-    parser.add_argument('--output_path',        type=str,   default='output/submission/t1',                                         help='Output path for storing testing results')
+    parser.add_argument('--output_path',        type=str,   default='output/testing_results/public_test',                           help='Output path for storing testing results')
 
     ## Model definition
     parser.add_argument('--n_mels',             type=int,   default=80,     help='Number of mel filterbanks')
