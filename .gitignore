@@ -4,6 +4,7 @@ logs
 pretrained_models
 notebooks
 **.bkp
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -136,4 +137,3 @@ dmypy.json
 .pyre/
 
 # Data folder
-/data/

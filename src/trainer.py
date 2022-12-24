@@ -66,7 +66,7 @@ def get_args():
     ## Training and test data
     parser.add_argument('--train_list',         type=str,   default="data/MSV_CommonVoice_data/metadata/all_new_metadata2.txt",     help='Train list')
     parser.add_argument('--test_list',          type=str,   default="data/Test/veri_test2.txt",                                     help='Evaluation list')
-    parser.add_argument('--train_path',         type=str,   default="D:/Data/MSV_CommonVoice_data/",           help='Absolute path to the train set')
+    parser.add_argument('--train_path',         type=str,   default="D:/Data/MSV_CommonVoice_data/",                                help='Absolute path to the train set')
     parser.add_argument('--test_path',          type=str,   default="data/Test/wav",                                                help='Absolute path to the test set')
     parser.add_argument('--musan_path',         type=str,   default="data/musan_augment/",                                          help='Absolute path to the test set')
     parser.add_argument('--rir_path',           type=str,   default="data/rirs_noises/",                                            help='Absolute path to the test set')
