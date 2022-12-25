@@ -1,9 +1,8 @@
 model: SEResNet34
 encoder_type: ASP
-loss_function: angleproto
+loss_function: aamsoftmax
 n_classes: 1015
-batch_size: 16
-n_per_speaker: 2
+batch_size: 32
 max_seg_per_spk: 4
 augment: True
 max_epoch: 2

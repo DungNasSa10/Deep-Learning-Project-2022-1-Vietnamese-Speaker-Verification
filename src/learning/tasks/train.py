@@ -78,16 +78,15 @@ def train(rank: int, ngpus_per_node: int, args):
 
     ### Evaluation code - must run on single GPU
     if args.eval == True:
-        pytorch_total_params = sum(p.numel() for p in speaker_model.module.__S__.parameters())
+        pytorch_total_params = sum(p.numel() for p in speaker_model.module.__model__.parameters())
 
         print('Total parameters: ',pytorch_total_params)
         print('Test list',args.test_list)
         
         sc, lab = trainer.eval_network(**vars(args))
 
-        if args.gpu == 0:
-            result = tune_threshold_from_score(sc, lab, [1, 0.1])
-            print(time.strftime("%Y-%m-%d %H:%M:%S"), "VEER {:2.4f}".format(result[1]), '\n')
+        result = tune_threshold_from_score(sc, lab, [1, 0.1])
+        print(time.strftime("%Y-%m-%d %H:%M:%S"), "VEER {:2.4f}".format(result[1]), '\n')
 
         return
 
