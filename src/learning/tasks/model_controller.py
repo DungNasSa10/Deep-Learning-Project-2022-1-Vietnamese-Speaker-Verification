@@ -8,7 +8,7 @@ from torch.cuda.amp import autocast, GradScaler
 from learning.speaker_net import WrappedModel
 
 
-class ModelColtroller(object):
+class ModelController(object):
     def __init__(self, speaker_model: WrappedModel, optimizer = "adam", scheduler = "steplr", device = "cuda", gpu = 0, mixedprec = False, **kwargs):
 
         self.__model__ = speaker_model

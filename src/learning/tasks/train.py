@@ -9,7 +9,7 @@ import torch.distributed as dist
 from learning.speaker_net import SpeakerNet, WrappedModel
 from learning.dataset import TrainDataset, TrainDataSampler, worker_init_fn
 from learning.metrics import tune_threshold_from_score
-from .model_controller import ModelColtroller
+from .model_controller import ModelController
 
 
 warnings.simplefilter("ignore")
@@ -58,7 +58,7 @@ def train(rank: int, ngpus_per_node: int, args):
             drop_last=True,
         )
 
-    controller = ModelColtroller(speaker_model, gpu=rank, **vars(args))
+    controller = ModelController(speaker_model, gpu=rank, **vars(args))
 
     ### Load model weights
     model_files = glob.glob("%s/model0*.model" % args.model_save_path)

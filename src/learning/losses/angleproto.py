@@ -7,7 +7,7 @@ from learning.metrics import accuracy
 
 class AngleProto(nn.Module):
 
-    def __init__(self, init_w=10.0, init_b=-5.0):
+    def __init__(self, init_w: float=10.0, init_b: float=-5.0) -> None:
         super().__init__()
         self.test_normalize = True
         self.w = nn.Parameter(torch.tensor(init_w))
@@ -35,5 +35,5 @@ class AngleProto(nn.Module):
         return nloss, prec1
 
 
-def loss_init(init_w=10.0, init_b=-5.0, **kwargs):
+def loss_init(init_w: float=10.0, init_b=-5.0, **kwargs):
     return AngleProto(init_w=init_w, init_b=init_b)
