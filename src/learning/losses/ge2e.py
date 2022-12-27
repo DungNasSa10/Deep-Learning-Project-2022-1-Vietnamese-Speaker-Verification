@@ -42,7 +42,7 @@ class GE2E(nn.Module):
         torch.clamp(self.w, 1e-6)
         cos_sim_matrix = cos_sim_matrix * self.w + self.b
         
-        label = torch.from_numpy(np.asarray(range(0,stepsize))).cuda()
+        label = torch.from_numpy(np.asarray(range(0,stepsize))).to('cuda' if torch.cuda.is_available() else 'cpu')
         nloss = self.criterion(cos_sim_matrix.view(-1,stepsize), torch.repeat_interleave(label,repeats=gsize,dim=0).cuda())
         prec1 = accuracy(cos_sim_matrix.view(-1,stepsize).detach(), torch.repeat_interleave(label,repeats=gsize,dim=0).detach(), topk=(1,))[0]
 

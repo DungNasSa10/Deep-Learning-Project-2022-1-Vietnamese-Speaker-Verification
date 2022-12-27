@@ -1,12 +1,18 @@
 import streamlit as st
-import subprocess
 import os
 import time
 import hashlib
 import random
 
+from crawling.downloader import Downloader
+
+from learning.tasks.infer import infer
+
 
 def remove_file(file):
+    if file is None:
+        return
+
     if os.path.exists(file):
         os.remove(file)
 
@@ -15,74 +21,74 @@ def get_id(file_path):
     dr, fn = os.path.split(file_path)
     _hash = hashlib.sha256(f"{str(time.time())} {fn} {str(random.randint(1, 1000000))}".encode('utf-8')).hexdigest()
     p = os.path.join(dr, _hash[:16] + "-" + fn)
-    return p
+    return p.replace("\\", "/")
 
 
-def create_test_list(wav_paths: list, output_file: str):
-    assert len(wav_paths) > 1
-
-    with open(output_file, 'w', encoding='utf-8') as f:
-        size = len(wav_paths)
-        for i in range(0, size - 1):
-            for j in range(1, size):
-                f.write(wav_paths[i] + " " + wav_paths[j] + "\n")
-    f.close()
-
-
-def predict(wav_paths: list):
-    if len(wav_paths) <= 1:
-        st.warning("You must choose more audio files and remove duplicated files if exist")
+def predict(model_names, first_path: list, second_path):
+    if first_path is None or second_path is None:
+        st.warning("You must choose two audio files")
+        remove_file(first_path)
+        remove_file(second_path)
         return
 
-    if "test_list" in st.session_state:
-        remove_file(st.session_state.test_list)
+    for name in model_names:
+        prob = infer(model=name, 
+            pretrained_checkpoint=f"output/ckpt/{name}.model",
+            wav_path_1=first_path,
+            wav_path_2=second_path)
 
-    test_list = "data/tmp/test_list.txt"
-    test_list = get_id(test_list)
-    create_test_list(wav_paths, test_list)
-    st.session_state.test_list = test_list
+        st.write(f"Probability for {name}: {prob}")
 
-    # subprocess.check_call([
-    #     'python src/trainer.py', 
-    #     "--test",
-    #     "--model", "ResNet50 ",
-    #     "--encoder_type", "ASP ",
-    #     "--initial_model", "output/ckpt/resnet50/model000000028.model",
-    #     "--test_list", test_list,
-    #     "--test_path", "data/tmp/wavs",
-    #     "--output_path", "output/result/resnet50",
-    # ],  shell=True)
-
-    #### REmove all here
+    remove_file(first_path)
+    remove_file(second_path)
 
 
-with st.form("my-form", clear_on_submit=True):
-    uploaded_files = st.file_uploader("Choose audio", accept_multiple_files=True, type=['.wav', '.mp3'], key='files')
+def upfile_on_change(keys):
+    for key in keys:
+        if key in st.session_state:
+            remove_file(st.session_state[key])
+            del st.session_state[key]
 
-    if "wav_paths" not in st.session_state:
-        st.session_state.wav_paths = []
 
-    if len(uploaded_files) > 0:
-        for wp in st.session_state.wav_paths:
-            remove_file(wp)
+tmp_dir = "data/tmp/wavs"
+os.makedirs(tmp_dir, exist_ok=True)
+keys = ['upfile0', 'upfile1']
 
-        st.session_state.wav_paths = []
 
-        for uploaded_file in uploaded_files:
-            bytes_data = uploaded_file.getvalue()
-            tmp_dir = "data/tmp/wavs"
-            os.makedirs(tmp_dir, exist_ok=True)
-            path = os.path.join(tmp_dir, uploaded_file.name)
-            path = get_id(path)
+def upload_audio(msg, key, keys):
+    upfile = st.file_uploader(msg, type=['.wav', '.mp3'], on_change=upfile_on_change, args=(keys,))
+    if upfile is not None:
+        bytes_data = upfile.getvalue()
+        path = os.path.join(tmp_dir, upfile.name)
+        path.replace("\\", "/")
+        path = get_id(path)
 
-            with open(path, 'wb') as f:
-                f.write(bytes_data)
-            f.close()
+        with open(path, 'wb') as f:
+            f.write(bytes_data)
+        f.close()
 
-            st.session_state.wav_paths.append(path)
+        if os.path.splitext(path) == ".mp3":
+            wav_path = Downloader.mp3_to_wav(path)
+            os.remove(path)
+            path = wav_path
 
-    submitted = st.form_submit_button("Predict!")
+        st.session_state[key] = path
 
-    if submitted:
-        predict(st.session_state.wav_paths)
+        st.audio(bytes_data)
+  
+
+upload_audio("Choose first audio", key=keys[0], keys=keys)
+upload_audio("Choose second audio", key=keys[1], keys=keys)
+
+st.write("Choose your model")
+model_names = [
+    'SEResNet34',
+    'Rawnet3',
+]
+
+options = [st.checkbox(name) for name in model_names]
+
+submitted = st.button("Predict!")
+if submitted:
+    predict([name for name, op in zip(model_names, options) if op], *[st.session_state.get(k, None) for k in keys])
 

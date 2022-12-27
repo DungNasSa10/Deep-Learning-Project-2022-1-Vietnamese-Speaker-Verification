@@ -8,8 +8,8 @@ from torch.cuda.amp import autocast, GradScaler
 from learning.speaker_net import WrappedModel
 
 
-class ModelTrainer(object):
-    def __init__(self, speaker_model: WrappedModel, optimizer, scheduler, gpu, mixedprec, **kwargs):
+class ModelColtroller(object):
+    def __init__(self, speaker_model: WrappedModel, optimizer, scheduler, device, gpu, mixedprec, **kwargs):
 
         self.__model__ = speaker_model
 
@@ -21,6 +21,7 @@ class ModelTrainer(object):
 
         self.scaler = GradScaler()
 
+        self.device = device
         self.gpu = gpu
 
         self.mixedprec = mixedprec
@@ -49,7 +50,7 @@ class ModelTrainer(object):
 
             self.__model__.zero_grad()
 
-            label = torch.LongTensor(data_label).cuda()
+            label = torch.LongTensor(data_label).to(self.device)
 
             if self.mixedprec:
                 with autocast():
@@ -99,7 +100,7 @@ class ModelTrainer(object):
         for idx, file in tqdm.tqdm(enumerate(setfiles), total = len(setfiles)):
             audio, _  = soundfile.read(os.path.join(test_path, file))
             # Full utterance
-            data_1 = torch.FloatTensor(np.stack([audio],axis=0)).cuda()
+            data_1 = torch.FloatTensor(np.stack([audio],axis=0)).to(self.device)
 
             # Splited utterance matrix
             max_audio = 300 * 160 + 240
@@ -111,7 +112,7 @@ class ModelTrainer(object):
             for asf in startframe:
                 feats.append(audio[int(asf):int(asf)+max_audio])
             feats = np.stack(feats, axis = 0).astype(np.float)
-            data_2 = torch.FloatTensor(feats).cuda()
+            data_2 = torch.FloatTensor(feats).to(self.device)
             # Speaker embeddings
             with torch.no_grad():
                 embedding_1 = self.__model__(data_1)
@@ -142,6 +143,7 @@ class ModelTrainer(object):
         self.__model__.eval()
         files = []
         filename = test_list.split("/")[-1]
+        os.makedirs(output_path, exist_ok=True)
         f_write = open(os.path.join(output_path, filename), "w")
         embeddings = {}
         lines = open(test_list).read().splitlines()
@@ -155,7 +157,7 @@ class ModelTrainer(object):
         for idx, file in tqdm.tqdm(enumerate(setfiles), total = len(setfiles)):
             audio, _  = soundfile.read(os.path.join(test_path, file))
             # Full utterance
-            data_1 = torch.FloatTensor(np.stack([audio],axis=0)).cuda()
+            data_1 = torch.FloatTensor(np.stack([audio],axis=0)).to(self.device)
 
             # Splited utterance matrix
             max_audio = 300 * 160 + 240
@@ -167,7 +169,7 @@ class ModelTrainer(object):
             for asf in startframe:
                 feats.append(audio[int(asf):int(asf)+max_audio])
             feats = np.stack(feats, axis = 0).astype(np.float)
-            data_2 = torch.FloatTensor(feats).cuda()
+            data_2 = torch.FloatTensor(feats).to(self.device)
             # Speaker embeddings
             with torch.no_grad():
                 embedding_1 = self.__model__(data_1)
@@ -204,7 +206,7 @@ class ModelTrainer(object):
     def loadParameters(self, path):
 
         self_state = self.__model__.module.state_dict()
-        loaded_state = torch.load(path, map_location="cuda:%d" % self.gpu)
+        loaded_state = torch.load(path, map_location=f"cuda:{self.gpu}" if self.device == "cuda" else torch.device('cpu'))
         if len(loaded_state.keys()) == 1 and "model" in loaded_state:
             loaded_state = loaded_state["model"]
             newdict = {}
