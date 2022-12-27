@@ -3,7 +3,8 @@ import soundfile
 import torch
 import torch.nn.functional as F
 from learning.speaker_net import SpeakerNet, WrappedModel
-from learning.tasks.model_controller import ModelColtroller
+from learning.tasks.model_controller import ModelController
+import numpy as np
 
 
 
@@ -24,7 +25,7 @@ def infer(model: str = "SEResNet34",
     speaker_model = WrappedModel(speaker_model).to(device)
 
     # Create controller
-    controller = ModelColtroller(speaker_model=speaker_model)
+    controller = ModelController(speaker_model=speaker_model, device=device)
 
     # Load pretrained model
     controller.loadParameters(pretrained_checkpoint)

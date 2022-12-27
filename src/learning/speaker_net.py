@@ -3,8 +3,6 @@ import torch.nn as nn
 
 import importlib
 
-from learning.models.ECAPA_TDNN import ECAPA_TDNN
-
 
 class WrappedModel(nn.Module):
     
@@ -37,12 +35,9 @@ class SpeakerNet(nn.Module):
         self.device = device
 
     def forward(self, data: torch.tensor, label = None):
-        
+        print("device", self.device)
         data = data.reshape(-1, data.size()[-1]).to(self.device)
-        if isinstance(self.__model__, ECAPA_TDNN):
-            output = self.__model__(data, aug=True)
-        else:
-            output = self.__model__(data)
+        output = self.__model__(data)
 
         if label is None:
             return output

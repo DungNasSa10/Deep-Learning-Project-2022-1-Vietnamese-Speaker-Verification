@@ -8,8 +8,8 @@ from torch.cuda.amp import autocast, GradScaler
 from learning.speaker_net import WrappedModel
 
 
-class ModelColtroller(object):
-    def __init__(self, speaker_model: WrappedModel, optimizer, scheduler, device, gpu, mixedprec, **kwargs):
+class ModelController(object):
+    def __init__(self, speaker_model: WrappedModel, optimizer = "adam", scheduler = "steplr", device = "cuda", gpu = 0, mixedprec = False, **kwargs):
 
         self.__model__ = speaker_model
 
@@ -168,7 +168,7 @@ class ModelColtroller(object):
             startframe = np.linspace(0, audio.shape[0]-max_audio, num=5)
             for asf in startframe:
                 feats.append(audio[int(asf):int(asf)+max_audio])
-            feats = np.stack(feats, axis = 0).astype(np.float)
+            feats = np.stack(feats, axis = 0).astype(float)
             data_2 = torch.FloatTensor(feats).to(self.device)
             # Speaker embeddings
             with torch.no_grad():
@@ -182,7 +182,7 @@ class ModelColtroller(object):
             embedding_11, embedding_12 = embeddings[line.split()[0]]
             embedding_21, embedding_22 = embeddings[line.split()[1]]
             # Compute the scores
-            score_1 = torch.mean(torch.matmul(embedding_11, embedding_21.T)) # higher is positive
+            score_1 = torch.mean(torch.matmul(embedding_11, embedding_21.T)) 
             score_2 = torch.mean(torch.matmul(embedding_12, embedding_22.T))
             score = (score_1 + score_2) / 2
             score = score.detach().cpu().numpy()

@@ -5,7 +5,7 @@ from .layers import FbankAug, SEBasicBlock, PreEmphasis
 
 
 class ResNetSE(nn.Module):
-    def __init__(self, block, layers, num_filters, n_out, encoder_type='SAP', n_mels=40, log_input=True, **kwargs):
+    def __init__(self, block, layers, num_filters, n_out, encoder_type='ASP', n_mels=80, log_input=False, **kwargs):
         super(ResNetSE, self).__init__()
 
         print('Embedding size is %d, encoder %s.'%(n_out, encoder_type))
@@ -121,7 +121,7 @@ class ResNetSE(nn.Module):
         return x
 
 
-def model_init(n_out=256, **kwargs):
+def model_init(n_out=512, **kwargs):
     # Number of filters
     num_filters = [32, 64, 128, 256]
     model = ResNetSE(SEBasicBlock, [3, 4, 6, 3], num_filters, n_out, **kwargs)

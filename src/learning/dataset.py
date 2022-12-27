@@ -54,7 +54,7 @@ class AugmentWAV(object):
 	def __init__(self, musan_path, rir_path, max_frames):
 
 		self.max_frames = max_frames
-		self.max_audio  = max_audio = max_frames * 160 + 240
+		self.max_audio  =  max_frames * 160 + 240
 
 		self.noisetypes = ['noise', 'music']
 
@@ -183,31 +183,6 @@ class TrainDataset(Dataset):
 
 		return torch.FloatTensor(feat), self.data_label[index]
 
-	# Used for finetuning each language
-	
-	# def __getitem__(self, index):
-			
-	# 	audio = loadWAV(self.data_list[index], self.max_frames, evalmode=False)
-		
-	# 	if self.augment:
-	# 		aug_prob = random.uniform(0, 1)
-
-	# 		if "(" in self.data_list[index]:
-	# 			aug = aug_prob < 0.3
-	# 		else:
-	# 			aug = aug_prob < 0.6
-			
-	# 		if aug:
-	# 			augtype = random.randint(0,3)
-	# 			if augtype == 1:
-	# 				audio   = self.augment_wav.reverberate(audio)
-	# 			elif augtype == 2:
-	# 				audio   = self.augment_wav.additive_noise('music', audio)
-	# 			elif augtype == 3:
-	# 				audio   = self.augment_wav.additive_noise('noise', audio)
-
-	# 	return torch.FloatTensor(audio), self.data_label[index]
-
 	def __len__(self):
 		return len(self.data_list)
 
@@ -228,10 +203,10 @@ class TestDataset(Dataset):
 
 
 class TrainDataSampler(torch.utils.data.Sampler):
-	def __init__(self, data_source, batch_size, seed, nPerSpeaker=1, max_seg_per_spk=500, distributed=False, **kwargs):
+	def __init__(self, data_source, batch_size, seed, n_per_speaker=1, max_seg_per_spk=500, distributed=False, **kwargs):
 
 		self.data_label         = data_source.data_label
-		self.nPerSpeaker        = nPerSpeaker
+		self.n_per_speaker        = n_per_speaker
 		self.max_seg_per_spk    = max_seg_per_spk
 		self.batch_size         = batch_size
 		self.epoch              = 0
@@ -264,9 +239,9 @@ class TrainDataSampler(torch.utils.data.Sampler):
 		
 		for findex, key in enumerate(dictkeys):
 			data    = data_dict[key]
-			numSeg  = round_down(min(len(data), self.max_seg_per_spk), self.nPerSpeaker)
+			numSeg  = round_down(min(len(data), self.max_seg_per_spk), self.n_per_speaker)
 			
-			rp      = lol(np.arange(numSeg), self.nPerSpeaker)
+			rp      = lol(np.arange(numSeg), self.n_per_speaker)
 			flattened_label.extend([findex] * (len(rp)))
 			for indices in rp:
 				flattened_list.append([data[i] for i in indices])
@@ -303,31 +278,3 @@ class TrainDataSampler(torch.utils.data.Sampler):
 
 	def set_epoch(self, epoch: int) -> None:
 		self.epoch = epoch
-
-
-class UnlabeledDataset(Dataset):
-
-	def __init__(self, train_list, train_path, max_frames, **kwargs):
-
-		self.train_list = train_list
-		self.max_frames = max_frames
-		
-		# Read training files
-		with open(train_list) as dataset_file:
-			lines = dataset_file.readlines()
-
-		# Parse the training list into file names and ID indices
-		self.data_list  = []
-		
-		for _, line in enumerate(lines):
-			filename = os.path.join(train_path, line.strip())
-			self.data_list.append(filename)
-
-	def __getitem__(self, index):
-			
-		audio = loadWAV(self.data_list[index], self.max_frames, evalmode=False)
-
-		return torch.FloatTensor(audio)
-
-	def __len__(self):
-		return len(self.data_list)

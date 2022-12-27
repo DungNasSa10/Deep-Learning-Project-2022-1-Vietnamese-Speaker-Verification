@@ -1,1 +1,3 @@
 ckpt
+/model_checkpoints/
+/testing_results/sample_test/

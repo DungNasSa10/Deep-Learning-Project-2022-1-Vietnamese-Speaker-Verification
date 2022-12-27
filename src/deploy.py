@@ -67,8 +67,10 @@ def upload_audio(msg, key, keys):
             f.write(bytes_data)
         f.close()
 
-        if os.path.splitext(path) == ".mp3":
+        if os.path.splitext(path)[-1] == ".mp3":
+            print("start change")
             wav_path = Downloader.mp3_to_wav(path)
+            print("finish change")
             os.remove(path)
             path = wav_path
 
