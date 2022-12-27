@@ -62,7 +62,7 @@ class VGGVox(nn.Module):
 
         # Initialize audio transform
         self.instancenorm = nn.InstanceNorm1d(40)
-        self.torchfb      = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=512, win_length=400, hop_length=160, f_min=0.0, f_max=8000, pad=0, n_mels=40)
+        self.torchfb      = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=512, win_length=400, hop_length=160, f_min=0.0, f_max=8000, pad=0, n_mels=80)
 
     def forward(self, x):
         # disable gradient tracking and mixed-precision training

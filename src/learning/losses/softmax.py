@@ -5,7 +5,7 @@ from learning.metrics import accuracy
 
 
 class SoftmaxLoss(nn.Module):
-    def __init__(self, n_out: int, n_classes: int) -> None:
+    def __init__(self, n_out: int = 512, n_classes: int = 1015) -> None:
         super().__init__()
 
         self.test_normalize = True
@@ -30,5 +30,5 @@ class SoftmaxLoss(nn.Module):
         return loss, prec1
 
 
-def loss_init(n_out: int, n_classes: int, **kwargs):
+def loss_init(n_out: int = 512, n_classes: int = 1015, **kwargs):
     return SoftmaxLoss(n_out=n_out, n_classes=n_classes)

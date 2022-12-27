@@ -32,8 +32,8 @@ def get_args():
 
     ## Training details
     parser.add_argument('--test_interval',      type=int,   default=1,              help='Test and save every [test_interval] epochs')
-    parser.add_argument('--max_epoch',          type=int,   default=100,            help='Maximum number of epochs')
-    parser.add_argument('--trainfunc',          type=str,   default="",             help='Loss function')
+    parser.add_argument('--max_epoch',          type=int,   default=50,            help='Maximum number of epochs')
+    parser.add_argument('--loss_function',          type=str,   default="",             help='Loss function')
 
     ## Optimizer
     parser.add_argument('--optimizer',          type=str,   default="adam",         help='sgd or adam')
@@ -52,7 +52,7 @@ def get_args():
     parser.add_argument('--margin',             type=float, default=0.2,            help='Loss margin, only for some loss functions')
     parser.add_argument('--scale',              type=float, default=30,             help='Loss scale, only for some loss functions')
     parser.add_argument('--n_per_speaker',      type=int,   default=1,              help='Number of utterances per speaker per batch, only for metric learning based losses')
-    parser.add_argument('--n_classes',          type=int,   default=17714,          help='Number of speakers in the softmax layer, only for softmax-based losses')
+    parser.add_argument('--n_classes',          type=int,   default=1015,          help='Number of speakers in the softmax layer, only for softmax-based losses')
 
     ## Evaluation parameters
     parser.add_argument('--dcf_p_target',       type=float, default=0.05,           help='A priori probability of the specified target speaker')
@@ -64,28 +64,27 @@ def get_args():
     parser.add_argument('--save_path',          type=str,   default="exps/exp1",    help='Path for model and logs')
 
     ## Training and test data
-    parser.add_argument('--train_list',         type=str,   default="data/MSV_CommonVoice_data/metadata/all_new_metadata2.txt",     help='Train list')
-    parser.add_argument('--test_list',          type=str,   default="data/Test/veri_test2.txt",                                     help='Evaluation list')
-    parser.add_argument('--train_path',         type=str,   default="D:/Data/MSV_CommonVoice_data/",           help='Absolute path to the train set')
-    parser.add_argument('--test_path',          type=str,   default="data/Test/wav",                                                help='Absolute path to the test set')
+    parser.add_argument('--train_list',         type=str,   default="data/metadata/train/training_metadata.txt",                    help='Train list')
+    parser.add_argument('--test_list',          type=str,   default="data/metadata/test/test_pairs/public_test_pairs.txt",          help='Evaluation list')
+    parser.add_argument('--train_path',         type=str,   default="./",                                                           help='Absolute path to the train set')
+    parser.add_argument('--test_path',          type=str,   default="data/test/sv_vlsp_2021/public_test/competition_public_test",   help='Absolute path to the test set')
     parser.add_argument('--musan_path',         type=str,   default="data/musan_augment/",                                          help='Absolute path to the test set')
     parser.add_argument('--rir_path',           type=str,   default="data/rirs_noises/",                                            help='Absolute path to the test set')
-    parser.add_argument('--output_path',        type=str,   default='output/submission/t1',                                         help='Output path for storing testing results')
+    parser.add_argument('--output_path',        type=str,   default='output/testing_results/public_test',                           help='Output path for storing testing results')
 
     ## Model definition
     parser.add_argument('--n_mels',             type=int,   default=80,     help='Number of mel filterbanks')
     parser.add_argument('--log_input',          type=bool,  default=False,  help='Log input features')
     parser.add_argument('--model',              type=str,   default="",     help='Name of model definition')
-    parser.add_argument('--encoder_type',       type=str,   default="SAP",  help='Type of encoder')
+    parser.add_argument('--encoder_type',       type=str,   default="ASP",  help='Type of encoder')
     parser.add_argument('--n_out',              type=int,   default=512,    help='Embedding size in the last FC layer')
     parser.add_argument('--sinc_stride',        type=int,   default=10,     help='Stride size of the first analytic filterbank layer of RawNet3')
     parser.add_argument('--C',                  type=int,   default=1024,   help='Channel size for the speaker encoder (ECAPA_TDNN)')
 
-    ## For test only
+    ## For train / eval / test only
+    parser.add_argument('--train',              dest='train',               action='store_true', help='Train only')
     parser.add_argument('--eval',               dest='eval',                action='store_true', help='Eval only')
     parser.add_argument('--test',               dest='test',                action='store_true', help='Test only')
-    parser.add_argument('--freeze',             dest='freeze',              action='store_true')
-    parser.add_argument('--unfreeze_embedding', dest='unfreeze_embedding',  action='store_true')
 
     ## Distributed and mixed precision training
     parser.add_argument('--port',               type=str,           default="8888",         help='Port for distributed training, input as text')
@@ -116,11 +115,14 @@ def main():
     os.makedirs(args.model_save_path, exist_ok=True)
     os.makedirs(args.result_save_path, exist_ok=True)
 
-    n_gpus = torch.cuda.device_count()
+    args.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     print('Python Version:', sys.version)
     print('PyTorch Version:', torch.__version__)
-    print('Number of GPUs:', torch.cuda.device_count())
+    print(f"Detected device: {args.device}")
+    if args.device == "cuda":
+        n_gpus = torch.cuda.device_count()
+        print('Number of GPUs:', n_gpus)
     print('Save path:',args.save_path)
 
     if args.distributed:

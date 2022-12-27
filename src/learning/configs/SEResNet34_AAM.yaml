@@ -1,0 +1,16 @@
+model: SEResNet34
+encoder_type: ASP
+loss_function: aamsoftmax
+n_classes: 1015
+batch_size: 32
+max_seg_per_spk: 4
+augment: True
+max_epoch: 2
+save_path: output/SEResNet34_ASP_AAM
+train_list: data/metadata/train/training_metadata.txt
+train_path: ./
+test_list: data/metadata/test/sample_test_pairs_with_label.txt
+test_path: data/test/sv_vlsp_2021/public_test/competition_public_test
+musan_path: data/musan_augment
+rir_path: data/rirs_noises
+output_path: output/testing_results/public_test

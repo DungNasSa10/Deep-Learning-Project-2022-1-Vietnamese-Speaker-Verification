@@ -6,7 +6,7 @@ from learning.metrics import accuracy
 
 
 class AAMSoftmax(nn.Module):
-    def __init__(self, n_out, n_classes, margin=0.2, scale=30, easy_margin=False):
+    def __init__(self, n_out: int, n_classes: int, margin: float = 0.2, scale: int = 30, easy_margin: bool = False) -> None:
         super(AAMSoftmax, self).__init__()
 
         self.test_normalize = True
@@ -28,7 +28,7 @@ class AAMSoftmax(nn.Module):
 
         print('Initialised AAMSoftmax margin %.3f scale %.3f'%(self.m,self.s))
 
-    def forward(self, x, label=None):
+    def forward(self, x, label=None) -> None:
 
         assert x.size()[0] == label.size()[0]
         assert x.size()[1] == self.in_feats
@@ -54,5 +54,5 @@ class AAMSoftmax(nn.Module):
         return loss, prec1
 
 
-def loss_init(n_out, n_classes, margin=0.2, scale=30, easy_margin=False, **kwargs):
+def loss_init(n_out: int = 512, n_classes: int = 1015, margin: float = 0.2, scale:int = 30, easy_margin: bool = False, **kwargs):
     return AAMSoftmax(n_out=n_out, n_classes=n_classes, margin=margin, scale=scale, easy_margin=easy_margin)

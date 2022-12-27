@@ -28,7 +28,7 @@ class AngleProto(nn.Module):
         torch.clamp(self.w, 1e-6)
         cos_sim_matrix = cos_sim_matrix * self.w + self.b
         
-        label   = torch.from_numpy(np.asarray(range(0,stepsize))).cuda()
+        label   = torch.from_numpy(np.asarray(range(0,stepsize))).to('cuda' if torch.cuda.is_available() else 'cpu')
         nloss   = self.criterion(cos_sim_matrix, label)
         prec1   = accuracy(cos_sim_matrix.detach(), label.detach(), topk=(1,))[0]
 

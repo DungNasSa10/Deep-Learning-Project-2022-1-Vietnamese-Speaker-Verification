@@ -10,7 +10,7 @@ class SoftmaxProto(nn.Module):
     softmax.SoftmaxProto and angleproto.SoftmaxProto.
     """
 
-    def __init__(self, n_out: int, n_classes: int, init_w=10.0, init_b=-5.0):
+    def __init__(self, n_out: int = 512, n_classes: int = 1015, init_w=10.0, init_b=-5.0):
         super(SoftmaxProto, self).__init__()
 
         self.test_normalize = True
@@ -32,5 +32,5 @@ class SoftmaxProto(nn.Module):
         return nlossS+nlossP, prec1
 
 
-def loss_init(n_out: int, n_classes: int, init_w=10.0, init_b=-5.0, **kwargs):
+def loss_init(n_out: int = 512, n_classes: int = 1015, init_w=10.0, init_b=-5.0, **kwargs):
     return SoftmaxProto(n_out=n_out, n_classes=n_classes, init_w=init_w, init_b=init_b)
