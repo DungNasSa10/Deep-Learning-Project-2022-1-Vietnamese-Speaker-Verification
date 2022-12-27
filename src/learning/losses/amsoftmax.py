@@ -4,7 +4,7 @@ from learning.metrics import accuracy
 
 
 class AMSoftmax(nn.Module):
-    def __init__(self, n_out, n_classes, margin=0.3, scale=15):
+    def __init__(self, n_out: int, n_classes: int, margin:float = 0.3, scale: int = 15):
         super(AMSoftmax, self).__init__()
 
         self.test_normalize = True
@@ -46,5 +46,5 @@ class AMSoftmax(nn.Module):
         return loss, prec1
 
 
-def loss_init(n_out, n_classes, margin=0.3, scale=15, **kwargs):
+def loss_init(n_out: int = 512, n_classes: int = 1015, margin=0.3, scale=15, **kwargs):
     return AMSoftmax(n_out=n_out, n_classes=n_classes, margin=margin, scale=scale)
