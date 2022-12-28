@@ -5,13 +5,14 @@ import torchaudio
 
 
 class VGGVox(nn.Module):
-    def __init__(self, n_out=1024, encoder_type='SAP', log_input=True, **kwargs):
+    def __init__(self, n_out=1024, encoder_type='SAP', log_input=True, n_mels=40, **kwargs):
         super(VGGVox, self).__init__()
 
         print(f'Embedding size is {n_out}, encoder {encoder_type}.')
 
         self.encoder_type = encoder_type
         self.log_input = log_input
+        self.n_mels = n_mels
 
         # Define CNN layers
         self.netcnn = nn.Sequential(
@@ -62,7 +63,25 @@ class VGGVox(nn.Module):
 
         # Initialize audio transform
         self.instancenorm = nn.InstanceNorm1d(40)
-        self.torchfb      = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=512, win_length=400, hop_length=160, f_min=0.0, f_max=8000, pad=0, n_mels=80)
+        self.torchfb      = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=512, win_length=400, hop_length=160, f_min=0.0, f_max=8000, pad=0, n_mels=self.n_mels)
+
+    def new_parameter(self, *size):
+        """
+        creates a new tensor 
+        and initializes its values using the 
+        Xavier normal initialization method.
+
+        Args
+        ----
+            *size: specify the size of the tensor to be created
+
+        Return
+        ----
+            out:  the initialized tensor
+        """
+        out = nn.Parameter(torch.FloatTensor(*size))
+        nn.init.xavier_normal_(out)
+        return out
 
     def forward(self, x):
         # disable gradient tracking and mixed-precision training
@@ -85,24 +104,6 @@ class VGGVox(nn.Module):
             x = torch.sum(x * w, dim=1)
         x = self.fc(x)
         return x
-
-    def new_parameter(self, *size):
-        """
-        creates a new tensor 
-        and initializes its values using the 
-        Xavier normal initialization method.
-
-        Args
-        ----
-            *size: specify the size of the tensor to be created
-
-        Return
-        ----
-            out:  the initialized tensor
-        """
-        out = nn.Parameter(torch.FloatTensor(*size))
-        nn.init.xavier_normal_(out)
-        return out
 
 
 def model_init(n_out=1024, encoder_type='SAP', log_input=True, **kwargs):

@@ -35,7 +35,7 @@ class SpeakerNet(nn.Module):
         self.device = device
 
     def forward(self, data: torch.tensor, label = None):
-        print("device", self.device)
+        
         data = data.reshape(-1, data.size()[-1]).to(self.device)
         output = self.__model__(data)
 
