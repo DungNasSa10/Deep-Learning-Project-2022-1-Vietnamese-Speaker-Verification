@@ -18,7 +18,7 @@ def infer(model: str = "SEResNet34",
 
     # Create model
     if model == "VGGVox":
-        speaker_model = SpeakerNet(model=model, device=device, n_mels=80, log_inputs=False, encoder_type="SAP", n_out=1024)
+        speaker_model = SpeakerNet(model=model, device=device, n_mels=40, log_inputs=False, encoder_type="SAP", n_out=512)
     else:
         speaker_model = SpeakerNet(model=model, device=device, n_mels=80, log_inputs=False, encoder_type="ASP", sinc_stride=10, C=1024, n_out=512)
         
@@ -36,7 +36,7 @@ def infer(model: str = "SEResNet34",
     embeddings = {}
     setfiles = list(set(files))
 
-    for idx, file in tqdm.tqdm(enumerate(setfiles), total = len(setfiles)):
+    for i, file in tqdm.tqdm(enumerate(setfiles), total = len(setfiles)):
         audio, _  = soundfile.read(file)
         # Full utterance
         data_1 = torch.FloatTensor(np.stack([audio],axis=0)).to(controller.device)

@@ -5,35 +5,38 @@ from .layers import FbankAug, SEBasicBlock, PreEmphasis
 
 
 class ResNetSE(nn.Module):
-    def __init__(self, block, layers, num_filters, n_out, encoder_type='ASP', n_mels=80, log_input=False, **kwargs):
-        super(ResNetSE, self).__init__()
 
-        print('Embedding size is %d, encoder %s.'%(n_out, encoder_type))
-
-        self.specaug = FbankAug() # Spec augmentation
+    def __init__(self, block: nn.Module, layers: list, num_filters: list, n_out: int = 512, encoder_type: str = 'ASP', n_mels: int = 80, log_input: bool = False, **kwargs) -> None:
         
+        super().__init__()
+
+        print(f"Embedding size is {n_out}, encoder {encoder_type}.")
+
         self.inplanes   = num_filters[0]
         self.encoder_type = encoder_type
         self.n_mels     = n_mels
         self.log_input  = log_input
 
+        self.torchfb = torch.nn.Sequential(
+            PreEmphasis(squeeze_output=True),
+            torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=512, win_length=400, hop_length=160, window_fn=torch.hamming_window, n_mels=n_mels)
+        )
+
+        self.instancenorm = nn.InstanceNorm1d(n_mels)
+
+        # SpecAugment
+        self.specaug = FbankAug()
+
         self.conv1 = nn.Conv2d(1, num_filters[0] , kernel_size=3, stride=1, padding=1)
         self.relu = nn.ReLU(inplace=True)
         self.bn1 = nn.BatchNorm2d(num_filters[0])
-        
 
         self.layer1 = self._make_layer(block, num_filters[0], layers[0])
         self.layer2 = self._make_layer(block, num_filters[1], layers[1], stride=(2, 2))
         self.layer3 = self._make_layer(block, num_filters[2], layers[2], stride=(2, 2))
         self.layer4 = self._make_layer(block, num_filters[3], layers[3], stride=(2, 2))
 
-        self.instancenorm   = nn.InstanceNorm1d(n_mels)
-        self.torchfb        = torch.nn.Sequential(
-                PreEmphasis(squeeze_output=True),
-                torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=512, win_length=400, hop_length=160, window_fn=torch.hamming_window, n_mels=n_mels)
-                )
-
-        outmap_size = int(self.n_mels/8)
+        outmap_size = int(self.n_mels / 8)
 
         self.attention = nn.Sequential(
             nn.Conv1d(num_filters[3] * outmap_size, 128, kernel_size=1),
@@ -41,7 +44,7 @@ class ResNetSE(nn.Module):
             nn.BatchNorm1d(128),
             nn.Conv1d(128, num_filters[3] * outmap_size, kernel_size=1),
             nn.Softmax(dim=2),
-            )
+        )
 
         if self.encoder_type == "SAP":
             out_dim = num_filters[3] * outmap_size
@@ -59,8 +62,10 @@ class ResNetSE(nn.Module):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
 
-    def _make_layer(self, block, planes, blocks, stride=1):
+    def _make_layer(self, block: nn.Module, planes: int, blocks: int, stride=1):
+        
         downsample = None
+
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Sequential(
                 nn.Conv2d(self.inplanes, planes * block.expansion,
@@ -71,17 +76,20 @@ class ResNetSE(nn.Module):
         layers = []
         layers.append(block(self.inplanes, planes, stride, downsample))
         self.inplanes = planes * block.expansion
+
         for i in range(1, blocks):
             layers.append(block(self.inplanes, planes))
 
         return nn.Sequential(*layers)
 
     def new_parameter(self, *size):
+        
         out = nn.Parameter(torch.FloatTensor(*size))
         nn.init.xavier_normal_(out)
+
         return out
 
-    def forward(self, x, aug=False):
+    def forward(self, x, aug: bool = False):
 
         with torch.no_grad():
             with torch.cuda.amp.autocast(enabled=False):
@@ -89,7 +97,6 @@ class ResNetSE(nn.Module):
 
                 if self.log_input: 
                     x = x.log()
-
                 if aug == True:
                     x = self.specaug(x)
                     
@@ -121,8 +128,9 @@ class ResNetSE(nn.Module):
         return x
 
 
-def model_init(n_out=512, **kwargs):
-    # Number of filters
+def model_init(n_out: int = 512, encoder_type: str = "ASP", **kwargs):
+    
     num_filters = [32, 64, 128, 256]
-    model = ResNetSE(SEBasicBlock, [3, 4, 6, 3], num_filters, n_out, **kwargs)
+    model = ResNetSE(block=SEBasicBlock, layers=[3, 4, 6, 3], num_filters=num_filters, n_out=n_out, encoder_type=encoder_type, **kwargs)
+    
     return model

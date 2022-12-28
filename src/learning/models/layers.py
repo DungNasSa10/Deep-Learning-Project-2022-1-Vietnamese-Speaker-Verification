@@ -5,10 +5,13 @@ import math
 
 
 class SEBasicBlock(nn.Module):
+
     expansion = 1
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, reduction=8):
-        super(SEBasicBlock, self).__init__()
+
+        super().__init__()
+
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, padding=1, bias=False)
@@ -19,6 +22,7 @@ class SEBasicBlock(nn.Module):
         self.stride = stride
 
     def forward(self, x):
+
         residual = x
 
         out = self.conv1(x)
@@ -34,18 +38,19 @@ class SEBasicBlock(nn.Module):
 
         out += residual
         out = self.relu(out)
+
         return out
 
 
 class SEBottleneck(nn.Module):
+
     expansion = 4
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, reduction=8):
-        super(SEBottleneck, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
-                               padding=1, bias=False)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
         self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(planes * 4)
@@ -55,6 +60,7 @@ class SEBottleneck(nn.Module):
         self.stride = stride
 
     def forward(self, x):
+
         residual = x
 
         out = self.conv1(x)
@@ -79,7 +85,9 @@ class SEBottleneck(nn.Module):
 
 
 class SELayer(nn.Module):
+
     def __init__(self, channel, reduction=8):
+
         super(SELayer, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
@@ -90,13 +98,16 @@ class SELayer(nn.Module):
         )
 
     def forward(self, x):
+
         b, c, _, _ = x.size()
         y = self.avg_pool(x).view(b, c)
         y = self.fc(y).view(b, c, 1, 1)
+
         return x * y
 
 
 class PreEmphasis(nn.Module):
+
     def __init__(self, coef: float = 0.97, squeeze_output: bool=False):
         """
         This layer is based on: 
@@ -131,11 +142,13 @@ class PreEmphasis(nn.Module):
 class FbankAug(nn.Module):
 
     def __init__(self, freq_mask_width = (0, 8), time_mask_width = (0, 10)):
+
         self.time_mask_width = time_mask_width
         self.freq_mask_width = freq_mask_width
         super().__init__()
 
     def mask_along_axis(self, x, dim):
+
         original_size = x.shape
         batch, fea, time = x.shape
         if dim == 1:
@@ -157,11 +170,13 @@ class FbankAug(nn.Module):
             mask = mask.unsqueeze(1)
             
         x = x.masked_fill_(mask, 0.0)
+
         return x.view(*original_size)
 
     def forward(self, x):    
         x = self.mask_along_axis(x, dim=2)
         x = self.mask_along_axis(x, dim=1)
+
         return x
 
 
@@ -189,10 +204,12 @@ class AFMS(nn.Module):
 
         x = x + self.alpha
         x = x * y
+
         return x
 
 
 class Res2MaxPoolingBlock(nn.Module):
+
     def __init__(
         self, 
         in_channels: int, 
@@ -254,6 +271,7 @@ class Res2MaxPoolingBlock(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        
         ### First Conv1d + ReLU + BN
         output = self.conv_1(x)
         output = self.relu(output)

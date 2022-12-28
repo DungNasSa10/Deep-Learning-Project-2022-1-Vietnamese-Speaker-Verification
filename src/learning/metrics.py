@@ -90,6 +90,7 @@ def compute_error_rates(scores, labels):
     # true positive rate.  Subtract these quantities from 1 to
     # get the false positive rates.
     fprs = [1 - x / float(fprs_norm) for x in fprs]
+
     return fnrs, fprs, thresholds
 
 
@@ -110,4 +111,5 @@ def compute_min_dcf(fnrs, fprs, thresholds, p_target, c_miss, c_fa):
     # See Equations (3) and (4).  Now we normalize the cost.
     c_def = min(c_miss * p_target, c_fa * (1 - p_target))
     min_dcf = min_c_det / c_def
+    
     return min_dcf, min_c_det_threshold

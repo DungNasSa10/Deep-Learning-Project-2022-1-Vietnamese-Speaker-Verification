@@ -32,8 +32,8 @@ def get_args():
 
     ## Training details
     parser.add_argument('--test_interval',      type=int,   default=1,              help='Test and save every [test_interval] epochs')
-    parser.add_argument('--max_epoch',          type=int,   default=50,            help='Maximum number of epochs')
-    parser.add_argument('--loss_function',          type=str,   default="",             help='Loss function')
+    parser.add_argument('--max_epoch',          type=int,   default=50,             help='Maximum number of epochs')
+    parser.add_argument('--loss_function',      type=str,   default="",             help='Loss function')
 
     ## Optimizer
     parser.add_argument('--optimizer',          type=str,   default="adam",         help='sgd or adam')
@@ -52,7 +52,7 @@ def get_args():
     parser.add_argument('--margin',             type=float, default=0.2,            help='Loss margin, only for some loss functions')
     parser.add_argument('--scale',              type=float, default=30,             help='Loss scale, only for some loss functions')
     parser.add_argument('--n_per_speaker',      type=int,   default=1,              help='Number of utterances per speaker per batch, only for metric learning based losses')
-    parser.add_argument('--n_classes',          type=int,   default=1015,          help='Number of speakers in the softmax layer, only for softmax-based losses')
+    parser.add_argument('--n_classes',          type=int,   default=1015,           help='Number of speakers in the softmax layer, only for softmax-based losses')
 
     ## Evaluation parameters
     parser.add_argument('--dcf_p_target',       type=float, default=0.05,           help='A priori probability of the specified target speaker')

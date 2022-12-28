@@ -7,7 +7,7 @@ from learning.metrics import accuracy
 
 class GE2E(nn.Module):
 
-    def __init__(self, init_w=10.0, init_b=-5.0):
+    def __init__(self, init_w: float = 10.0, init_b: float = -5.0) -> None:
         super().__init__()
 
         self.test_normalize = True
@@ -18,7 +18,7 @@ class GE2E(nn.Module):
 
         print('Initialised GE2E')
 
-    def forward(self, x, label=None):
+    def forward(self, x, label: bool = None):
 
         assert x.size()[1] >= 2
 
@@ -28,26 +28,27 @@ class GE2E(nn.Module):
 
         cos_sim_matrix = []
 
-        for ii in range(0,gsize): 
-            idx = [*range(0,gsize)]
-            idx.remove(ii)
-            exc_centroids = torch.mean(x[:,idx,:], 1)
-            cos_sim_diag    = F.cosine_similarity(x[:,ii,:],exc_centroids)
-            cos_sim         = F.cosine_similarity(x[:,ii,:].unsqueeze(-1),centroids.unsqueeze(-1).transpose(0,2))
-            cos_sim[range(0,stepsize),range(0,stepsize)] = cos_sim_diag
-            cos_sim_matrix.append(torch.clamp(cos_sim,1e-6))
+        for i in range(0, gsize): 
+            idx = [*range(0, gsize)]
+            idx.remove(i)
+            exc_centroids = torch.mean(x[:, idx, :], 1)
+            cos_sim_diag    = F.cosine_similarity(x[:, i, :], exc_centroids)
+            cos_sim         = F.cosine_similarity(x[:, i, :].unsqueeze(-1), centroids.unsqueeze(-1).transpose(0, 2))
+            cos_sim[range(0, stepsize), range(0, stepsize)] = cos_sim_diag
+            cos_sim_matrix.append(torch.clamp(cos_sim, 1e-6))
 
-        cos_sim_matrix = torch.stack(cos_sim_matrix,dim=1)
+        cos_sim_matrix = torch.stack(cos_sim_matrix, dim=1)
 
         torch.clamp(self.w, 1e-6)
         cos_sim_matrix = cos_sim_matrix * self.w + self.b
         
         label = torch.from_numpy(np.asarray(range(0,stepsize))).to('cuda' if torch.cuda.is_available() else 'cpu')
-        nloss = self.criterion(cos_sim_matrix.view(-1,stepsize), torch.repeat_interleave(label,repeats=gsize,dim=0).cuda())
-        prec1 = accuracy(cos_sim_matrix.view(-1,stepsize).detach(), torch.repeat_interleave(label,repeats=gsize,dim=0).detach(), topk=(1,))[0]
+        nloss = self.criterion(cos_sim_matrix.view(-1,stepsize), torch.repeat_interleave(label, repeats=gsize, dim=0).cuda())
+        prec1 = accuracy(cos_sim_matrix.view(-1,stepsize).detach(), torch.repeat_interleave(label, repeats=gsize,dim=0).detach(), topk=(1,))[0]
 
         return nloss, prec1
 
 
-def loss_init(init_w=10.0, init_b=-5.0, **kwargs):
+def loss_init(init_w: float = 10.0, init_b: float = -5.0, **kwargs):
+
     return GE2E(init_w=init_w, init_b=init_b)

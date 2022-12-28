@@ -11,6 +11,7 @@ class WrappedModel(nn.Module):
     def __init__(self, model: nn.Module) -> None:
         
         super().__init__()
+        
         self.module = model
 
     def forward(self, x, label = None):

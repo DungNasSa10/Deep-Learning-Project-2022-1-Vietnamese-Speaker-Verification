@@ -6,8 +6,10 @@ from learning.metrics import accuracy
 
 
 class AAMSoftmax(nn.Module):
+
     def __init__(self, n_out: int, n_classes: int, margin: float = 0.2, scale: int = 30, easy_margin: bool = False) -> None:
-        super(AAMSoftmax, self).__init__()
+
+        super().__init__()
 
         self.test_normalize = True
         
@@ -16,6 +18,7 @@ class AAMSoftmax(nn.Module):
         self.in_feats = n_out
         self.w = torch.nn.Parameter(torch.FloatTensor(n_classes, n_out), requires_grad=True)
         self.ce = nn.CrossEntropyLoss()
+
         nn.init.xavier_normal_(self.w, gain=1)
 
         self.easy_margin = easy_margin
@@ -26,7 +29,7 @@ class AAMSoftmax(nn.Module):
         self.th = math.cos(math.pi - self.m)
         self.mm = math.sin(math.pi - self.m) * self.m
 
-        print('Initialized AAMSoftmax margin %.3f scale %.3f'%(self.m,self.s))
+        print('Initialized AAMSoftmax margin %.3f scale %.3f'%(self.m, self.s))
 
     def forward(self, x, label=None) -> None:
 
@@ -46,13 +49,16 @@ class AAMSoftmax(nn.Module):
 
         one_hot = torch.zeros(cosine.size(), device='cuda' if torch.cuda.is_available() else 'cpu')
         one_hot.scatter_(1, label.view(-1, 1), 1)
+
         output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
         output = output * self.s
 
         loss    = self.ce(output, label)
         prec1   = accuracy(output.detach(), label.detach(), topk=(1,))[0]
+
         return loss, prec1
 
 
 def loss_init(n_out: int = 512, n_classes: int = 1015, margin: float = 0.2, scale:int = 30, easy_margin: bool = False, **kwargs):
+
     return AAMSoftmax(n_out=n_out, n_classes=n_classes, margin=margin, scale=scale, easy_margin=easy_margin)
