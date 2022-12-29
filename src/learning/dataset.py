@@ -41,7 +41,7 @@ def loadWAV(filename, max_frames, evalmode=True, num_eval=10):
 		feats.append(audio)
 	else:
 		for asf in startframe:
-			feats.append(audio[int(asf):int(asf)+max_audio])
+			feats.append(audio[int(asf):int(asf) + max_audio])
 
 	feat = np.stack(feats,axis=0).astype(np.float)
 
