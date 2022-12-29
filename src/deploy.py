@@ -14,6 +14,7 @@ class Config:
     AUDIO_KEYS = ['upfile0', 'upfile1']
     TABLE_WIDTH = 600
 
+
 os.makedirs(Config.TEMPORARY_DIR, exist_ok=True)
 
 
@@ -42,8 +43,6 @@ def upload_audio(msg, key):
         bytes_data = upfile.getvalue()
         st.audio(bytes_data)
   
-
-
 
 def predict(model_names, audio_keys, table_canvas):
     for key in audio_keys:
@@ -79,32 +78,36 @@ def predict(model_names, audio_keys, table_canvas):
     pbar_canvas = st.empty()
     pbar = pbar_canvas.progress(0.0)
 
-    for idx, name in enumerate(model_names):
-        print("Model:", name)
-        prob = infer(model=name, 
-            pretrained_checkpoint=os.path.join(Config.CHECKPOINT_DIR, f"{name}.model"),
-            wav_path_1=audio_paths[0],
-            wav_path_2=audio_paths[1])
+    try:
+        for idx, name in enumerate(model_names):
+            print("Model:", name)
+            prob = infer(model=name, 
+                pretrained_checkpoint=os.path.join(Config.CHECKPOINT_DIR, f"{name}.model"),
+                wav_path_1=audio_paths[0],
+                wav_path_2=audio_paths[1])
 
-        results['Model'].append(name)
-        results["Probability"].append(prob)
-        
-        pbar.progress((idx + 1) / len(model_names))
-        table_canvas.dataframe(results, width=Config.TABLE_WIDTH)
+            results['Model'].append(name)
+            results["Probability"].append(prob)
+            
+            pbar.progress((idx + 1) / len(model_names))
+            table_canvas.dataframe(results, width=Config.TABLE_WIDTH)
 
-    pbar_canvas.empty()
-    st.session_state.results = results
-    for path in audio_paths:
-        remove_file(path)
+        pbar_canvas.empty()
+        st.session_state.results = results
+    finally:
+        for path in audio_paths:
+            remove_file(path)
 
     return True
 
 
 def main():
-    upload_audio("#Choose first audio",  Config.AUDIO_KEYS[0])
-    upload_audio("#Choose second audio", Config.AUDIO_KEYS[1])
+    st.write("## Demo for Deep Learning project of group 15")
+    st.write("### Choose your audio files")
+    upload_audio("Choose first audio",  Config.AUDIO_KEYS[0])
+    upload_audio("Choose second audio", Config.AUDIO_KEYS[1])
 
-    st.write("Choose your model")
+    st.write("### Choose your models")
     model_names = [
         'SEResNet34',
         "VGGVox",
