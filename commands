@@ -10,3 +10,4 @@ python src/trainer.py
 --output_path output/result/resnet50
 
 streamlit run src/deploy.py --server.address 127.0.0.1 --server.port 8008
+streamlit run src/deploy.py --server.address 192.168.88.245 --server.port 8008

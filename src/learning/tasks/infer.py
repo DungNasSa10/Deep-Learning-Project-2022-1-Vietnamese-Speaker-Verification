@@ -15,6 +15,7 @@ def infer(model: str = "SEResNet34",
         ) -> float:
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print("Detect device:", device)
 
     # Create model
     if model == "VGGVox":

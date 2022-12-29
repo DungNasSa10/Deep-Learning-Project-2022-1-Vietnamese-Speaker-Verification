@@ -1,20 +1,32 @@
-import streamlit as st
 import os
 import time
 import hashlib
 import random
+import streamlit as st
 
 from crawling.downloader import Downloader
-
 from learning.tasks.infer import infer
 
 
-def remove_file(file):
-    if file is None:
-        return
+class Config:
+    CHECKPOINT_DIR = "output/checkpoints"
+    TEMPORARY_DIR = "data/tmp/wavs"
+    AUDIO_KEYS = ['upfile0', 'upfile1']
+    TABLE_WIDTH = 600
 
-    if os.path.exists(file):
-        os.remove(file)
+os.makedirs(Config.TEMPORARY_DIR, exist_ok=True)
+
+
+def remove_file(file):
+    if file is not None:
+        if os.path.exists(file):
+            os.remove(file)
+
+
+def join_path(*args):
+    path = os.path.join(*args)
+    path.replace("\\", "/")
+    return path
 
 
 def get_id(file_path):
@@ -24,43 +36,32 @@ def get_id(file_path):
     return p.replace("\\", "/")
 
 
-def predict(model_names, first_path: list, second_path):
-    if first_path is None or second_path is None:
-        st.warning("You must choose two audio files")
-        remove_file(first_path)
-        remove_file(second_path)
-        return
-
-    for name in model_names:
-        prob = infer(model=name, 
-            pretrained_checkpoint=f"output/ckpt/{name}.model",
-            wav_path_1=first_path,
-            wav_path_2=second_path)
-
-        st.write(f"Probability for {name}: {prob}")
-
-    remove_file(first_path)
-    remove_file(second_path)
-
-
-def upfile_on_change(keys):
-    for key in keys:
-        if key in st.session_state:
-            remove_file(st.session_state[key])
-            del st.session_state[key]
-
-
-tmp_dir = "data/tmp/wavs"
-os.makedirs(tmp_dir, exist_ok=True)
-keys = ['upfile0', 'upfile1']
-
-
-def upload_audio(msg, key, keys):
-    upfile = st.file_uploader(msg, type=['.wav', '.mp3'], on_change=upfile_on_change, args=(keys,))
+def upload_audio(msg, key):
+    upfile = st.file_uploader(msg, type=['.wav', '.mp3'], key=key)
     if upfile is not None:
         bytes_data = upfile.getvalue()
-        path = os.path.join(tmp_dir, upfile.name)
-        path.replace("\\", "/")
+        st.audio(bytes_data)
+  
+
+
+
+def predict(model_names, audio_keys, table_canvas):
+    for key in audio_keys:
+        if st.session_state.get(key) is None:
+            st.warning("You must choose two audio files")
+            print("You must choose two audio files")
+            return False
+
+    results = {
+        "Model": [],
+        "Probability": []
+    }
+    audio_paths = []
+
+    for key in audio_keys:
+        upfile = st.session_state[key]
+        bytes_data = upfile.getvalue()
+        path = join_path(Config.TEMPORARY_DIR, upfile.name)
         path = get_id(path)
 
         with open(path, 'wb') as f:
@@ -68,29 +69,67 @@ def upload_audio(msg, key, keys):
         f.close()
 
         if os.path.splitext(path)[-1] == ".mp3":
-            print("start change")
             wav_path = Downloader.mp3_to_wav(path)
-            print("finish change")
             os.remove(path)
             path = wav_path
+        
+        audio_paths.append(path)
 
-        st.session_state[key] = path
+    table_canvas.empty()
+    pbar_canvas = st.empty()
+    pbar = pbar_canvas.progress(0.0)
 
-        st.audio(bytes_data)
-  
+    for idx, name in enumerate(model_names):
+        print("Model:", name)
+        prob = infer(model=name, 
+            pretrained_checkpoint=os.path.join(Config.CHECKPOINT_DIR, f"{name}.model"),
+            wav_path_1=audio_paths[0],
+            wav_path_2=audio_paths[1])
 
-upload_audio("Choose first audio", key=keys[0], keys=keys)
-upload_audio("Choose second audio", key=keys[1], keys=keys)
+        results['Model'].append(name)
+        results["Probability"].append(prob)
+        
+        pbar.progress((idx + 1) / len(model_names))
+        table_canvas.dataframe(results, width=Config.TABLE_WIDTH)
 
-st.write("Choose your model")
-model_names = [
-    'SEResNet34',
-    'Rawnet3',
-]
+    pbar_canvas.empty()
+    st.session_state.results = results
+    for path in audio_paths:
+        remove_file(path)
 
-options = [st.checkbox(name) for name in model_names]
+    return True
 
-submitted = st.button("Predict!")
-if submitted:
-    predict([name for name, op in zip(model_names, options) if op], *[st.session_state.get(k, None) for k in keys])
 
+def main():
+    upload_audio("#Choose first audio",  Config.AUDIO_KEYS[0])
+    upload_audio("#Choose second audio", Config.AUDIO_KEYS[1])
+
+    st.write("Choose your model")
+    model_names = [
+        'SEResNet34',
+        "VGGVox",
+        "ECAPA_TDNN",
+        "ECAPA_CNN_TDNN",
+        'RawNet3',
+    ]
+
+    options = [st.checkbox(name) for name in model_names]
+
+    submitted_btn = st.empty()
+    table_canvas = st.empty()
+
+    if "results" in st.session_state:
+        table_canvas.dataframe(st.session_state.results, width=Config.TABLE_WIDTH)
+
+    submitted = submitted_btn.button("Submit", key='1')
+    if submitted:
+        submitted_btn.button("Waiting", disabled=True, key='2')
+        if predict(
+            [name for name, op in zip(model_names, options) if op], 
+            Config.AUDIO_KEYS, 
+            table_canvas
+        ):
+            st.experimental_rerun()
+
+
+main()
