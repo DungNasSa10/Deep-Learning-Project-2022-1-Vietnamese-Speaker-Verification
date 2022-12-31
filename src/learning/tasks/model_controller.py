@@ -105,9 +105,12 @@ class ModelController(object):
         for idx, file in tqdm.tqdm(enumerate(setfiles), total = len(setfiles)):
             audio, _  = soundfile.read(os.path.join(test_path, file))
             if use_vad:
-                speech_timestamps = fn_get_speech_timestamps(audio, vad_model, sampling_rate=16000)
-                audio = fn_collect_chunks(speech_timestamps, torch.Tensor(audio))
-                audio = audio.numpy()
+                try:
+                    speech_timestamps = fn_get_speech_timestamps(audio, vad_model, sampling_rate=16000)
+                    audio = fn_collect_chunks(speech_timestamps, torch.Tensor(audio))
+                    audio = audio.numpy()
+                except:
+                    pass
 
             # Full utterance
             data_1 = torch.FloatTensor(np.stack([audio], axis=0)).to(self.device)
@@ -171,9 +174,12 @@ class ModelController(object):
         for idx, file in tqdm.tqdm(enumerate(setfiles), total = len(setfiles)):
             audio, _  = soundfile.read(os.path.join(test_path, file))
             if use_vad:
-                speech_timestamps = fn_get_speech_timestamps(audio, vad_model, sampling_rate=16000)
-                audio = fn_collect_chunks(speech_timestamps, torch.Tensor(audio))
-                audio = audio.numpy()
+                try:
+                    speech_timestamps = fn_get_speech_timestamps(audio, vad_model, sampling_rate=16000)
+                    audio = fn_collect_chunks(speech_timestamps, torch.Tensor(audio))
+                    audio = audio.numpy()
+                except: 
+                    pass
 
             # Full utterance
             data_1 = torch.FloatTensor(np.stack([audio], axis=0)).to(self.device)
