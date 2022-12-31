@@ -85,6 +85,7 @@ def get_args():
     parser.add_argument('--train',              dest='train',               action='store_true', help='Train only')
     parser.add_argument('--eval',               dest='eval',                action='store_true', help='Eval only')
     parser.add_argument('--test',               dest='test',                action='store_true', help='Test only')
+    parser.add_argument('--use_vad',            dest='use_vad',             action='store_true', help='Use VAD when testing')
 
     ## Distributed and mixed precision training
     parser.add_argument('--port',               type=str,           default="8888",         help='Port for distributed training, input as text')

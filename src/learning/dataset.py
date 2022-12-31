@@ -16,7 +16,7 @@ def round_down(num, divisor):
 def worker_init_fn(worker_id):
 	np.random.seed(np.random.get_state()[1][0] + worker_id)
 
-def loadWAV(filename, max_frames, evalmode=True, num_eval=10):
+def loadWAV(filename, max_frames, evalmode=True, num_eval=10, use_vad=False):
 
 	# Maximum audio length
 	max_audio = max_frames * 160 + 240

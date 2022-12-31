@@ -106,7 +106,7 @@ def train(rank: int, ngpus_per_node: int, args):
 
         if rank == 0:
             print(time.strftime("%Y-%m-%d %H:%M:%S"), "Epoch {:d}, TAcc: {:2.2f}, TLOSS {:f}, LR {:f}".format(it, train_eer, loss, max(clr)))
-            score_file.write("Epoch {:d}, TLOSS {:f}, TAcc {:2.2f}, LR {:f} \n".format(it, train_eer, loss, max(clr)))
+            score_file.write("Epoch {:d}, TAcc: {:2.2f}, TLOSS {:f}, LR {:f} \n".format(it, train_eer, loss, max(clr)))
 
         if it % args.test_interval == 0:
             # sc, lab, _ = controller.evaluateFromList(**vars(args))

@@ -1,9 +1,10 @@
 import numpy as np
 import importlib, sys, time, tqdm, soundfile, os
 
-import torch
+import torch, torchaudio
 import torch.nn.functional as F
 from torch.cuda.amp import autocast, GradScaler
+from torch import hub
 
 from learning.speaker_net import WrappedModel
 
@@ -86,7 +87,7 @@ class ModelController(object):
     ## Evaluate from list
     ## ===== ===== ===== ===== ===== ===== ===== =====
 
-    def eval_network(self, test_list, test_path, **kwargs):
+    def eval_network(self, test_list, test_path, use_vad, **kwargs):
         self.__model__.eval()
         files = []
         embeddings = {}
@@ -97,10 +98,19 @@ class ModelController(object):
         setfiles = list(set(files))
         setfiles.sort()
 
+        if use_vad:
+            vad_model, vad_utils = hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False, onnx=True)
+            fn_get_speech_timestamps, fn_save_audio, fn_read_audio, VADIterator, fn_collect_chunks = vad_utils
+
         for idx, file in tqdm.tqdm(enumerate(setfiles), total = len(setfiles)):
             audio, _  = soundfile.read(os.path.join(test_path, file))
+            if use_vad:
+                speech_timestamps = fn_get_speech_timestamps(audio, vad_model, sampling_rate=16000)
+                audio = fn_collect_chunks(speech_timestamps, torch.Tensor(audio))
+                audio = audio.numpy()
+
             # Full utterance
-            data_1 = torch.FloatTensor(np.stack([audio],axis=0)).to(self.device)
+            data_1 = torch.FloatTensor(np.stack([audio], axis=0)).to(self.device)
 
             # Splited utterance matrix
             max_audio = 300 * 160 + 240
@@ -139,7 +149,7 @@ class ModelController(object):
     ## Evaluate from list
     ## ===== ===== ===== ===== ===== ===== ===== =====
 
-    def test_from_list(self, test_list, test_path, output_path, **kwargs):
+    def test_from_list(self, test_list, test_path, output_path, use_vad, **kwargs):
         self.__model__.eval()
         files = []
         filename = test_list.split("/")[-1]
@@ -154,10 +164,19 @@ class ModelController(object):
         setfiles = list(set(files))
         setfiles.sort()
 
+        if use_vad:
+            vad_model, vad_utils = hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False, onnx=True)
+            fn_get_speech_timestamps, fn_save_audio, fn_read_audio, VADIterator, fn_collect_chunks = vad_utils
+
         for idx, file in tqdm.tqdm(enumerate(setfiles), total = len(setfiles)):
             audio, _  = soundfile.read(os.path.join(test_path, file))
+            if use_vad:
+                speech_timestamps = fn_get_speech_timestamps(audio, vad_model, sampling_rate=16000)
+                audio = fn_collect_chunks(speech_timestamps, torch.Tensor(audio))
+                audio = audio.numpy()
+
             # Full utterance
-            data_1 = torch.FloatTensor(np.stack([audio],axis=0)).to(self.device)
+            data_1 = torch.FloatTensor(np.stack([audio], axis=0)).to(self.device)
 
             # Splited utterance matrix
             max_audio = 300 * 160 + 240
