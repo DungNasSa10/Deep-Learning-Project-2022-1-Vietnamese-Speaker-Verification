@@ -3,10 +3,10 @@ log_input: True
 encoder_type: ASP
 loss_function: aamsoftmax
 n_classes: 1015
-batch_size: 4
-max_seg_per_spk: 4
+batch_size: 128
+max_seg_per_spk: 1000
 augment: True
-max_epoch: 4
+max_epoch: 50
 save_path: output/SEResNet34_ASP_AAM
 train_list: data/metadata/train/training_metadata.txt
 train_path: ./

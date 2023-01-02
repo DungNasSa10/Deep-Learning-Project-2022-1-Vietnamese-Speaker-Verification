@@ -24,8 +24,8 @@ def get_args():
     ## Data loader
     parser.add_argument('--max_frames',         type=int,   default=200,            help='Input length to the network for training')
     parser.add_argument('--eval_frames',        type=int,   default=300,            help='Input length to the network for testing 0 uses the whole files')
-    parser.add_argument('--batch_size',         type=int,   default=200,            help='Batch size, number of speakers per batch')
-    parser.add_argument('--max_seg_per_spk',    type=int,   default=500,            help='Maximum number of utterances per speaker per epoch')
+    parser.add_argument('--batch_size',         type=int,   default=128,            help='Batch size, number of speakers per batch')
+    parser.add_argument('--max_seg_per_spk',    type=int,   default=1000,            help='Maximum number of utterances per speaker per epoch')
     parser.add_argument('--nDataLoaderThread',  type=int,   default=4,              help='Number of loader threads')
     parser.add_argument('--augment',            type=bool,  default=False,          help='Augment input')
     parser.add_argument('--seed',               type=int,   default=10,             help='Seed for the random number generator')
@@ -61,7 +61,7 @@ def get_args():
 
     ## Load and save
     parser.add_argument('--initial_model',      type=str,   default="",             help='Initial model weights')
-    parser.add_argument('--save_path',          type=str,   default="exps/exp1",    help='Path for model and logs')
+    parser.add_argument('--save_path',          type=str,   default="output/",    help='Path for model and logs')
 
     ## Training and test data
     parser.add_argument('--train_list',         type=str,   default="data/metadata/train/training_metadata.txt",                    help='Train list')

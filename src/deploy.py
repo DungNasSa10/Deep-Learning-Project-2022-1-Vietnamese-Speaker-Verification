@@ -109,11 +109,11 @@ def main():
 
     st.write("### Choose your models")
     model_names = [
-        'SEResNet34',
-        "VGGVox",
-        "ECAPA_TDNN",
         "ECAPA_CNN_TDNN",
-        'RawNet3',
+        "ECAPA_TDNN",
+        "RawNet3",
+        "SEResNet34",
+        "VGG_M_40",
     ]
 
     options = [st.checkbox(name) for name in model_names]

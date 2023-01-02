@@ -18,7 +18,7 @@ def infer(model: str = "SEResNet34",
     print("Detect device:", device)
 
     # Create model
-    if model == "VGGVox":
+    if model == "VGG_M_40":
         speaker_model = SpeakerNet(model=model, device=device, n_mels=40, log_inputs=False, encoder_type="SAP", n_out=512)
     else:
         speaker_model = SpeakerNet(model=model, device=device, n_mels=80, log_inputs=False, encoder_type="ASP", sinc_stride=10, C=1024, n_out=512)
