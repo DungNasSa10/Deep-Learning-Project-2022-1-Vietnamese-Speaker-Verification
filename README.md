@@ -92,7 +92,7 @@ output
 ## Crawling process
 - We have prepared some csv files used for crawling in folder ```data/metadata/crawl```. You can create new files by make a copy of the template in this link [crawling-template](https://docs.google.com/spreadsheets/d/1z6By1Umim0xpomV0HyC4wG16B0KSKC2eGPobDzPrCbg/edit?usp=sharing), download  
 in csv form and put it in the folder ```data/metadata/crawl```. 
-- The following script will download all the videos in the csv file ```data/metadata/crawl/Voice list - An.csv```, convert them to .wav file, resample them into 16000 sample rate, use Silero VAD model to collect speech chunks, remove noisy audios and save the results in the folder ```data/train```. The argument -f refer to the path of the csv file, you can also put the link to the files saved Google Drive while the argument -d specify the folder in which crawled data will be stored in.
+- The following script will download all the videos in the csv file ```data/metadata/crawl/Voice list - An.csv```, convert them to .wav file, resample them into 16000 sample rate, use Silero VAD model to collect speech chunks, remove noisy audios and save the results in the folder ```data/train```. The argument -f refer to the path of the csv file, you can also put the link to the files saved in Google Drive while the argument -d specify the folder in which crawled data will be stored in.
 ```
 python src/crawl.py -f https://drive.google.com/file/d/1BL4tkLkPPDeuYwlCaMvIrKYCst8E4zEN/view?usp=share_link -d ./data/train -sr 16000
 ```
