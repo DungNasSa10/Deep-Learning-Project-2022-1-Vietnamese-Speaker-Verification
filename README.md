@@ -158,7 +158,7 @@ python src/learn.py --config src/learning/configs/RawNet3_AAN.yaml --test
 - If you want to train on Kaggle, make a copy and run the Testing part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv?scriptVersionId=115057715)
 
 ## **Deployment**
-
+- You can download model checkpoints in [checkpoints](https://drive.google.com/drive/folders/1NQD_znYfCGELMoqavFcM0scBurlDcxjh) and put it in the folder ```output```
 - Run the following command to test our deployment
 ```
 streamlit run src/deploy.py --server.address 127.0.0.1 --server.port 8008
