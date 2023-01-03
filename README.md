@@ -1,6 +1,6 @@
-# **Deep-Learning-Project-2022-1**
+# **Deep-Learning-Project-2022-1-Vietnamese-Speaker-Verification**
 
-- [**Deep-Learning-Project-2022-1**](#deep-learning-project-2022-1)
+- [**Deep-Learning-Project-2022-1-Vietnamese-Speaker-Verification**](#deep-learning-project-2022-1-vietnamese-speaker-verification)
   - [**Installation**](#installation)
   - [**Data and Output Folder**](#data-and-output-folder)
   - [**Datasets**](#datasets)
