@@ -53,7 +53,7 @@ def predict(model_names, audio_keys, table_canvas):
 
     results = {
         "Model": [],
-        "Probability": []
+        "The similarity of the speakers": []
     }
     audio_paths = []
 
@@ -87,7 +87,7 @@ def predict(model_names, audio_keys, table_canvas):
                 wav_path_2=audio_paths[1])
 
             results['Model'].append(name)
-            results["Probability"].append(prob)
+            results["The similarity of the speakers"].append(prob)
             
             pbar.progress((idx + 1) / len(model_names))
             table_canvas.dataframe(results, width=Config.TABLE_WIDTH)
