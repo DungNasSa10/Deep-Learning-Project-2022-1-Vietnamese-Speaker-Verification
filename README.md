@@ -127,17 +127,17 @@ python src/learn.py --config src/learning/configs/ECAPA_TDNN_AP.yaml --train
 - If you want to train on Kaggle, make a copy and run the Training part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv?scriptVersionId=115057715)
 
 ## **Evaluation**
-- This command will eval the trained model SEResNet34 with Angular Prototypical loss on Public test and output the EER(%).
+- This command will evaluate the trained model SEResNet34 with Angular Prototypical loss on Public test and output the EER(%).
 ```
-python src/learn.py --config src/learning/configs/SEResNet34_AP.yaml --eval
+python src/learn.py --eval --config src/learning/configs/SEResNet34_AP.yaml --initial_model path/to/model/checkpoints 
 ```
-- This command will eval the trained model ECAPA CNN-TDNN with AAM-Softmax loss on T01 Private test.
+- This command will evaluate the trained model ECAPA CNN-TDNN with AAM-Softmax loss on T01 Private test.
 ```
-python src/learn.py --config src/learning/configs/ECAPA_CNN_TDNN_AAN.yaml --eval
+python src/learn.py --eval --config src/learning/configs/ECAPA_CNN_TDNN_AAN.yaml --initial_model path/to/model/checkpoints
 ```
-- This command will eval the trained model RawNet3 with AAM-Softmax loss on T02 Private test.
+- This command will evalate the trained model RawNet3 with AAM-Softmax loss on T02 Private test.
 ```
-python src/learn.py --config src/learning/configs/RawNet3_AAN.yaml --eval
+python src/learn.py --eval --config src/learning/configs/RawNet3_AAN.yaml --initial_model path/to/model/checkpoints
 ```
 - Again, you can change the path of eval file in the config file. These eval files are saved in folder ```data/metadata/test/labels```
 - If you want to train on Kaggle, make a copy and run the Evaluation part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv?scriptVersionId=115057715)
@@ -145,15 +145,15 @@ python src/learn.py --config src/learning/configs/RawNet3_AAN.yaml --eval
 ## **Testing**
 - This command will test the trained model SEResNet34 with Angular Prototypical loss on Public test. The output is a csv file of the form ```audio_1 audio_2 similarity_score``` and be stored in ```output/testing_results/public_test```
 ```
-python src/learn.py --config src/learning/configs/VGG_M_40_AP.yaml --test
+python src/learn.py --test --config src/learning/configs/VGG_M_40_AP.yaml --initial_model path/to/model/checkpoints
 ```
 - This command will eval the trained model ECAPA CNN-TDNN with AAM-Softmax loss on T01 Private test.
 ```
-python src/learn.py --config src/learning/configs/ECAPA_CNN_TDNN_AAN.yaml --test
+python src/learn.py --test --config src/learning/configs/ECAPA_CNN_TDNN_AAN.yaml --initial_model path/to/model/checkpoints
 ```
 - This command will eval the trained model RawNet3 with AAM-Softmax loss on T02 Private test.
 ```
-python src/learn.py --config src/learning/configs/RawNet3_AAN.yaml --test
+python src/learn.py --test --config src/learning/configs/RawNet3_AAN.yaml --initial_model path/to/model/checkpoints
 ```
 - Again, you can change the path of test file in the config file. These test files are saved in folder ```data/metadata/test/test_pairs```
 - If you want to train on Kaggle, make a copy and run the Testing part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv?scriptVersionId=115057715)
