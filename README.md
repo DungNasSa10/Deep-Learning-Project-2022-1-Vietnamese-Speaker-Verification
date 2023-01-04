@@ -124,7 +124,7 @@ python src/learn.py --config src/learning/configs/SEResNet34_AAM.yaml --train
 ```
 python src/learn.py --config src/learning/configs/ECAPA_TDNN_AP.yaml --train
 ```
-- If you want to train on Kaggle, make a copy and run the Training part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv?scriptVersionId=115057715)
+- If you want to train on Kaggle, make a copy and run the Training part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv)
 
 ## **Evaluation**
 - This command will evaluate the trained model SEResNet34 with Angular Prototypical loss on Public test and output the EER(%).
@@ -140,7 +140,7 @@ python src/learn.py --eval --config src/learning/configs/ECAPA_CNN_TDNN_AAN.yaml
 python src/learn.py --eval --config src/learning/configs/RawNet3_AAN.yaml --initial_model path/to/model/checkpoints
 ```
 - Again, you can change the path of eval file in the config file. These eval files are saved in folder ```data/metadata/test/labels```
-- If you want to train on Kaggle, make a copy and run the Evaluation part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv?scriptVersionId=115057715)
+- If you want to train on Kaggle, make a copy and run the Evaluation part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv)
 
 ## **Testing**
 - This command will test the trained model SEResNet34 with Angular Prototypical loss on Public test. The output is a csv file of the form ```audio_1 audio_2 similarity_score``` and be stored in ```output/testing_results/public_test```
@@ -156,7 +156,7 @@ python src/learn.py --test --config src/learning/configs/ECAPA_CNN_TDNN_AAN.yaml
 python src/learn.py --test --config src/learning/configs/RawNet3_AAN.yaml --initial_model path/to/model/checkpoints
 ```
 - Again, you can change the path of test file in the config file. These test files are saved in folder ```data/metadata/test/test_pairs```
-- If you want to train on Kaggle, make a copy and run the Testing part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv?scriptVersionId=115057715)
+- If you want to train on Kaggle, make a copy and run the Testing part in this notebook [Vietnamese_SV](https://www.kaggle.com/code/dungnasa10/train-sv)
 
 ## **Deployment**
 - You can download model checkpoints in [checkpoints](https://drive.google.com/drive/folders/1NQD_znYfCGELMoqavFcM0scBurlDcxjh) and put it in the folder ```output```
