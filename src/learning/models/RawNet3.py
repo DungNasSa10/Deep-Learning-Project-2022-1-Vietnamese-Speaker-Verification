@@ -79,7 +79,7 @@ class RawNet3(nn.Module):
 
         ### Res2MaxPooling blocks
         self.res2mp_1 = Res2MaxPoolingBlock(
-            channels // 4, channels, kernel_size=3, dilation=7, scale=model_scale, max_pooling_size=5
+            channels // 4, channels, kernel_size=3, dilation=2, scale=model_scale, max_pooling_size=5
         )
 
         self.res2mp_2 = Res2MaxPoolingBlock(
@@ -197,6 +197,7 @@ def model_init(**kwargs):
         summed=True,
         out_bn=False,
         norm_sinc='mean',
+        log_sinc=True,
         grad_mult=1,
         **kwargs
     )
