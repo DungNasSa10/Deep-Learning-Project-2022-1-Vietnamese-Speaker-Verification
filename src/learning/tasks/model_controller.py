@@ -232,12 +232,13 @@ class ModelController(object):
 
         self_state = self.__model__.module.state_dict()
         loaded_state = torch.load(path, map_location=f"cuda:{self.gpu}" if self.device == "cuda" else torch.device('cpu'))
+        print(len(loaded_state.keys()))
         if len(loaded_state.keys()) == 1 and "model" in loaded_state:
             loaded_state = loaded_state["model"]
             newdict = {}
             delete_list = []
             for name, param in loaded_state.items():
-                new_name = "__S__."+name
+                new_name = "__model__." + name
                 newdict[new_name] = param
                 delete_list.append(name)
             loaded_state.update(newdict)
