@@ -205,7 +205,7 @@ class TrainDataSampler(torch.utils.data.Sampler):
 	def __init__(self, data_source, batch_size, seed, n_per_speaker=1, max_seg_per_spk=500, distributed=False, **kwargs):
 
 		self.data_label         = data_source.data_label
-		self.n_per_speaker        = n_per_speaker
+		self.n_per_speaker       = n_per_speaker
 		self.max_seg_per_spk    = max_seg_per_spk
 		self.batch_size         = batch_size
 		self.epoch              = 0
