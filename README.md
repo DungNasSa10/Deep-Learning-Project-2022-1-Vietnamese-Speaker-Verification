@@ -9,7 +9,7 @@
   - [**Evaluation**](#evaluation)
   - [**Testing**](#testing)
   - [**Deployment**](#deployment)
-  - [**Tasks**](#tasks)
+  - [**Contributions**](#contributions)
 
 
 ## **Installation**
@@ -165,5 +165,5 @@ python src/learn.py --test --config src/learning/configs/RawNet3_AAN.yaml --init
 streamlit run src/deploy.py --server.address 127.0.0.1 --server.port 8008
 ```
 
-## **Tasks**
-In this link [Tasks](https://docs.google.com/spreadsheets/d/1hwrZj654uYwo2FODcguMOOvoCSDyrVHt/edit#gid=2118221502)
+## **Contributions**
+You can find the contribution of each member in this link [Contributions](https://docs.google.com/spreadsheets/d/1hwrZj654uYwo2FODcguMOOvoCSDyrVHt/edit#gid=2118221502)
